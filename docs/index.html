@@ -25,17 +25,17 @@
     input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #00f0ff; cursor: pointer; }
     textarea:focus, input:focus { outline: none; border-color: rgba(0,240,255,0.3) !important; }
 
-    /* Cinematic Earth */
-    .earth-container { position: relative; width: 100%; height: 70vh; min-height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .earth-glow { position: absolute; width: 300px; height: 300px; border-radius: 50%;
+    /* Cinematic Earth — compact */
+    .earth-container { position: relative; width: 100%; height: 42vh; min-height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .earth-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #1a5a8a 0%, #0d3050 25%, #071e38 50%, #030e1c 75%, #010509 100%);
       box-shadow: 0 0 120px 40px rgba(0,120,255,0.08), 0 0 60px 20px rgba(0,180,255,0.05), inset -30px -15px 50px rgba(0,0,0,0.9), inset 8px 8px 30px rgba(80,160,255,0.06);
     }
-    .earth-atmosphere { position: absolute; width: 320px; height: 320px; border-radius: 50%;
+    .earth-atmosphere { position: absolute; width: 240px; height: 240px; border-radius: 50%;
       background: radial-gradient(circle, transparent 45%, rgba(60,140,255,0.04) 55%, rgba(40,120,255,0.08) 65%, rgba(20,80,200,0.04) 80%, transparent 100%);
       box-shadow: 0 0 80px 30px rgba(0,100,255,0.04);
     }
-    .earth-continents { position: absolute; width: 600px; height: 300px; border-radius: 50%;
+    .earth-continents { position: absolute; width: 440px; height: 220px; border-radius: 50%;
       background:
         radial-gradient(ellipse 15% 22% at 18% 35%, rgba(30,110,70,0.5) 0%, transparent 100%),
         radial-gradient(ellipse 10% 15% at 23% 32%, rgba(35,120,65,0.4) 0%, transparent 100%),
@@ -46,20 +46,21 @@
         radial-gradient(ellipse 8% 11% at 75% 28%, rgba(30,110,58,0.35) 0%, transparent 100%),
         radial-gradient(ellipse 20% 6% at 40% 72%, rgba(255,255,255,0.08) 0%, transparent 100%);
     }
-    .earth-clip { position: absolute; width: 300px; height: 300px; border-radius: 50%; overflow: hidden; }
+    .earth-clip { position: absolute; width: 220px; height: 220px; border-radius: 50%; overflow: hidden; }
     .earth-horizon { position: absolute; bottom: -20%; left: -10%; width: 120%; height: 50%;
       background: linear-gradient(to top, rgba(0,80,200,0.06), transparent);
     }
 
-    @keyframes earth-rotate { from { transform: translateX(0); } to { transform: translateX(-300px); } }
-    @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes earth-rotate { from { transform: translateX(0); } to { transform: translateX(-220px); } }
+    @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse-soft { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
     .animate-earth { animation: earth-rotate 80s linear infinite; }
     .animate-float { animation: float-slow 6s ease-in-out infinite; }
-    .animate-fade { animation: fade-in 1.2s ease-out; }
-    .animate-fade-delay { animation: fade-in 1.2s ease-out 0.4s both; }
-    .animate-fade-delay2 { animation: fade-in 1.2s ease-out 0.8s both; }
+    .animate-fade { animation: fade-in 1s ease-out; }
+    .animate-fade-delay { animation: fade-in 1s ease-out 0.3s both; }
+    .animate-fade-delay2 { animation: fade-in 1s ease-out 0.6s both; }
+    .animate-fade-delay3 { animation: fade-in 1s ease-out 0.9s both; }
     .animate-pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
   </style>
 </head>
@@ -80,29 +81,27 @@ const DEFAULT_STATE = {
   },
   eko: {
     livello: 1, xp: 0, xpMax: 100, titolo: "Eco Nascente",
-    tratti: ["Curiosità", "Memoria", "Pianificazione", "UI/UX Review"],
+    tratti: ["Curiosità", "Pianificazione", "UI/UX Review"],
     xpLog: [],
-    personalita: { ironia: 7, formalita: 3, creativita: 8, tough_love: 6, verbosita: 4, empatia: 8, proattivita: 7, filosofico: 5 },
+    personalita: { ironia: 7, tough_love: 6, creativita: 8 },
     questEko: [
       { id: "EQ001", n: "GitHub Deployment", d: "Platform live on GitHub Pages", s: "ok", o: "auto" },
       { id: "EQ002", n: "Telegram Mini App", d: "Integrare piattaforma come Web App dentro Telegram", s: "attesa", o: "auto" },
       { id: "EQ003", n: "Design System Sync", d: "Collegare Storybook UniversiData alla piattaforma", s: "attesa", o: "auto" },
       { id: "EQ004", n: "Analytics Engine", d: "Grafici trend peso e stats nel tempo", s: "attesa", o: "auto" },
       { id: "EQ005", n: "Journaling Module", d: "Sezione journaling con prompt mattina/sera", s: "attesa", o: "auto" },
-      { id: "EQ006", n: "A-Frame nella Natura", d: "Piano di fuga: A-frame house nella natura.", s: "attesa", o: "auto", priorita: "febbraio-2026" },
-    ],
-    memoria: [
-      "Tailwind CSS è il framework (UniversiData)",
-      "Cristina = priorità #1",
-      "Fauno ama la natura — obiettivo: A-frame house",
-      "Estetica: space theme + cyberpunk",
-      "GitHub repo: github.com/FaunoUD/eko",
+      { id: "EQ006", n: "A-Frame nella Natura", d: "Piano di fuga: A-frame house nella natura.", s: "attesa", o: "auto" },
+      { id: "EQ007", n: "Scheduler Engine", d: "Connect scheduler toggles to actual Telegram notifications via Railway bot", s: "attesa", o: "auto" },
+      { id: "EQ008", n: "Personality Sync", d: "Sync personality sliders to Telegram Eko behavior", s: "attesa", o: "auto" },
+      { id: "EQ009", n: "Migrate to Vite + React Router", d: "Proper multi-page React app with build step", s: "attesa", o: "auto" },
     ],
   },
   cristina: {
     dateImportanti: [{ data: "", evento: "Anniversario", nota: "" }, { data: "", evento: "Compleanno Cristina", nota: "" }],
     gestaRecenti: [], noteRelazione: [], moodCheck: null, ultimoGesto: null,
-    promemoria: ["Hai ascoltato Cristina oggi?", "Quando è stata l'ultima volta che l'hai sorpresa?", "Lei è la priorità. Prima di UniversiData."],
+    promemoria: ["Hai ascoltato Cristina oggi?", "Quando è stata l'ultima volta che l'hai sorpresa?", "Lei è la priorità. Prima di UniversiData.", "Un piccolo gesto vale più di mille promesse.", "Chiedile come sta. Ascolta davvero."],
+    ciclo: { ultimoInizio: "", durataMedia: 28, durataMestruazione: 5, log: [] },
+    eventiSpeciali: [],
   },
   universidata: { taskAttivi: [], scadenze: [], noteStrategiche: [], prioritaSettimana: "" },
   quests: [
@@ -116,14 +115,15 @@ const DEFAULT_STATE = {
     { id: 8, n: "Cristina Time", d: "30 min dedicati a lei", xp: 20, t: "cuore", done: false, i: "❤️" },
     { id: 9, n: "English Challenge", d: "Daily English exercise", xp: 15, t: "mente", done: false, i: "🇬🇧" },
   ],
+  questHistory: [],
   scheduler: [
-    { id: "S1", n: "Morning Check-in", d: "Peso + quest", f: "07:30", on: true, t: "notifica" },
-    { id: "S2", n: "Evening Review", d: "Recap + journaling", f: "21:00", on: true, t: "notifica" },
-    { id: "S3", n: "Weekly Report", d: "Report completo", f: "Dom 10:00", on: true, t: "report" },
-    { id: "S4", n: "Curiosity", d: "Domanda per conoscerti", f: "13:00", on: true, t: "curiosita" },
-    { id: "S5", n: "Cristina Reminder", d: "Hai dedicato tempo a lei?", f: "19:00", on: true, t: "cuore" },
+    { id: "S1", n: "Morning Check-in", d: "Peso + quest", f: "07:30", on: false, t: "notifica" },
+    { id: "S2", n: "Evening Review", d: "Recap + journaling", f: "21:00", on: false, t: "notifica" },
+    { id: "S3", n: "Weekly Report", d: "Report completo", f: "Dom 10:00", on: false, t: "report" },
+    { id: "S4", n: "Curiosity", d: "Domanda per conoscerti", f: "13:00", on: false, t: "curiosita" },
+    { id: "S5", n: "Cristina Reminder", d: "Hai dedicato tempo a lei?", f: "19:00", on: false, t: "cuore" },
   ],
-  log: [{ t: new Date().toLocaleString("it-IT"), x: "Eko v3.0 — Platform redesign live.", c: "system" }],
+  log: [{ t: new Date().toLocaleString("it-IT"), x: "Eko v4.0 — Full redesign live.", c: "system" }],
   english: { streak: 0, bestStreak: 0, lastPractice: null, vocabLog: [], completedToday: false, totalCompleted: 0, level: "Beginner Explorer", focusToday: "business" },
   improvements: [
     { id: "I1", titolo: "Telegram Mini App", desc: "Dashboard as Web App inside Telegram.", stato: "proposta", impatto: "critico" },
@@ -135,13 +135,8 @@ const DEFAULT_STATE = {
 
 const PERS = {
   ironia: { n: "Ironia", i: "😏", lo: "Serio", hi: "Comedian" },
-  formalita: { n: "Formalità", i: "👔", lo: "Bro", hi: "Professore" },
-  creativita: { n: "Creatività", i: "🎨", lo: "Pragmatico", hi: "Visionario" },
   tough_love: { n: "Tough Love", i: "🔨", lo: "Gentile", hi: "Sergente" },
-  verbosita: { n: "Verbosità", i: "💬", lo: "Telegram", hi: "Romanzo" },
-  empatia: { n: "Empatia", i: "❤️", lo: "Analitico", hi: "Terapeuta" },
-  proattivita: { n: "Proattività", i: "⚡", lo: "Attendo", hi: "Sommergo" },
-  filosofico: { n: "Filosofico", i: "🧠", lo: "Pratico", hi: "Monaco" },
+  creativita: { n: "Creatività", i: "🎨", lo: "Pragmatico", hi: "Visionario" },
 };
 
 const QUOTES = [
@@ -155,6 +150,21 @@ const QUOTES = [
   "Not all those who wander are lost.",
   "Your task is not to seek for love, but to find all the barriers you have built against it.",
   "The universe is not outside of you. Look inside yourself; everything that you want, you already are.",
+];
+
+const CURIOSITY_QUESTIONS = [
+  "What's the one thing you'd never forgive yourself for not trying?",
+  "If Cristina described you in three words, what would they be?",
+  "What scares you more: failing or never starting?",
+  "Which version of yourself from 5 years ago would be most surprised by today?",
+  "What's a belief you held strongly but changed your mind about?",
+  "If you had one year with no obligations, what would you build?",
+  "What does your ideal Tuesday look like?",
+  "What's the bravest thing you've done this month?",
+  "If UniversiData didn't exist, what would you be doing?",
+  "What would the A-frame house version of you be like?",
+  "When do you feel most alive?",
+  "What's the hardest lesson nature taught you?",
 ];
 
 const GREETINGS = {
@@ -201,9 +211,9 @@ const StarField = () => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    const stars = Array.from({ length: 100 }, () => ({
+    const stars = Array.from({ length: 80 }, () => ({
       x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-      r: Math.random() * 1.3 + 0.2, a: Math.random(), s: Math.random() * 0.006 + 0.002
+      r: Math.random() * 1.2 + 0.2, a: Math.random(), s: Math.random() * 0.005 + 0.002
     }));
     let frame;
     const draw = () => {
@@ -245,9 +255,9 @@ const Card = ({ children, className = "", accent = null }) => (
   </div>
 );
 
-const Btn = ({ children, onClick, color = "#00f0ff", full = false, disabled = false }) => (
+const Btn = ({ children, onClick, color = "#00f0ff", full = false, disabled = false, small = false }) => (
   <button onClick={onClick} disabled={disabled}
-    className={`text-[11px] font-mono py-2.5 px-4 rounded-lg cursor-pointer transition-all active:scale-95 ${full ? 'w-full' : ''}`}
+    className={`font-mono rounded-lg cursor-pointer transition-all active:scale-95 ${full ? 'w-full' : ''} ${small ? 'text-[9px] py-1.5 px-2.5' : 'text-[11px] py-2.5 px-4'}`}
     style={{ background: `${color}10`, border: `1px solid ${color}40`, color: disabled ? 'rgba(200,210,230,0.2)' : color, opacity: disabled ? 0.5 : 1 }}>
     {children}
   </button>
@@ -271,19 +281,49 @@ const SubTabs = ({ tabs, active, onChange }) => (
   </div>
 );
 
+// ═══════ STAT TILE (for Home) ═══════
+const StatTile = ({ label, value, sub, color, icon }) => (
+  <div className="rounded-xl p-3 border" style={{ background: "rgba(8,12,24,0.85)", borderColor: `${color}15` }}>
+    <div className="text-[9px] font-mono tracking-wider mb-1" style={{ color: `${color}80` }}>{icon} {label}</div>
+    <div className="text-xl font-bold font-mono leading-none" style={{ color }}>{value}</div>
+    {sub && <div className="text-[8px] font-mono mt-1" style={{ color: "rgba(200,210,230,0.2)" }}>{sub}</div>}
+  </div>
+);
+
 // ═══════ MAIN APP ═══════
 function App() {
-  const loadState = () => { try { const s = localStorage.getItem(STORAGE_KEY); if (s) return { ...DEFAULT_STATE, ...JSON.parse(s) }; } catch(e) {} return DEFAULT_STATE; };
+  const loadState = () => {
+    try {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if (s) {
+        const parsed = JSON.parse(s);
+        // Deep merge with defaults to add new fields
+        return {
+          ...DEFAULT_STATE,
+          ...parsed,
+          cristina: { ...DEFAULT_STATE.cristina, ...parsed.cristina, ciclo: { ...DEFAULT_STATE.cristina.ciclo, ...(parsed.cristina?.ciclo || {}) } },
+          eko: { ...DEFAULT_STATE.eko, ...parsed.eko, personalita: { ironia: parsed.eko?.personalita?.ironia ?? 7, tough_love: parsed.eko?.personalita?.tough_love ?? 6, creativita: parsed.eko?.personalita?.creativita ?? 8 } },
+          questHistory: parsed.questHistory || [],
+        };
+      }
+    } catch(e) {}
+    return DEFAULT_STATE;
+  };
 
   const [s, setS] = useState(loadState);
   const [tab, setTab] = useState("home");
   const [lifeSub, setLifeSub] = useState("cristina");
+  const [ekoSub, setEkoSub] = useState("profile");
+  const [questSub, setQuestSub] = useState("active");
   const [wIn, setWIn] = useState("");
   const [xIn, setXIn] = useState("");
-  const [q, setQ] = useState("");
-  const [showQ, setShowQ] = useState(false);
+  const [curQ, setCurQ] = useState("");
+  const [showCurQ, setShowCurQ] = useState(false);
   const [cNote, setCNote] = useState("");
   const [cGesto, setCGesto] = useState("");
+  const [cEvento, setCEvento] = useState("");
+  const [cEventoData, setCEventoData] = useState("");
+  const [cCicloData, setCCicloData] = useState("");
   const [uTask, setUTask] = useState("");
   const [uNote, setUNote] = useState("");
   const [msg, setMsg] = useState("");
@@ -295,7 +335,7 @@ function App() {
 
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e) {} }, [s]);
 
-  const { fauno, eko, quests, cristina, universidata, english, scheduler, log, improvements } = s;
+  const { fauno, eko, quests, questHistory, cristina, universidata, english, scheduler, log, improvements } = s;
 
   const flash = (m) => { setMsg(m); setTimeout(() => setMsg(""), 2500); };
   const addLog = useCallback((x, c = "system") => { setS(p => ({ ...p, log: [{ t: new Date().toLocaleString("it-IT"), x, c }, ...p.log].slice(0, 80) })); }, []);
@@ -305,23 +345,53 @@ function App() {
     try { await fetch(`https://api.telegram.org/bot8579718161:AAEruE9Owq7cURcius6K6DTcADaDkAKOD2o/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "94050788", text: message, parse_mode: "Markdown" }) }); } catch(e) {}
   };
 
-  // Actions
+  // ═══ QUEST ACTIONS ═══
   const doQuest = (id) => {
     const quest = quests.find(q => q.id === id); if (!quest || quest.done) return;
     const map = { corpo: "corpo", mente: "mente", disciplina: "disciplina", spirito: "spirito", carisma: "carisma", salute: "resistenza", cuore: "empatia" };
     const key = map[quest.t];
     setS(p => {
       const ns = { ...p.fauno.stats }; if (key && ns[key] !== undefined) ns[key] = Math.min(100, ns[key] + (quest.t === "disciplina" ? 5 : 3));
-      return { ...p, quests: p.quests.map(q => q.id === id ? { ...q, done: true } : q), fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } } };
+      return { ...p, quests: p.quests.map(q => q.id === id ? { ...q, done: true, completedAt: new Date().toISOString() } : q), fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } } };
     });
     addLog(`Quest "${quest.n}" completed (+${quest.xp}xp)`, "quest"); flash(`+${quest.xp} XP!`);
   };
 
+  const archiveQuest = (id) => {
+    setS(p => {
+      const quest = p.quests.find(q => q.id === id);
+      if (!quest) return p;
+      return {
+        ...p,
+        quests: p.quests.filter(q => q.id !== id),
+        questHistory: [...p.questHistory, { ...quest, archivedAt: new Date().toISOString() }],
+      };
+    });
+    flash("Archived");
+  };
+
+  const deleteFromHistory = (id) => {
+    setS(p => ({ ...p, questHistory: p.questHistory.filter(q => q.id !== id) }));
+    flash("Deleted");
+  };
+
+  const resetDailyQuests = () => {
+    setS(p => ({
+      ...p,
+      quests: p.quests.map(q => ({ ...q, done: false, completedAt: undefined })),
+    }));
+    addLog("Daily quests reset", "system"); flash("New day, new quests!");
+  };
+
+  // ═══ WEIGHT ═══
   const saveWeight = () => { const w = parseFloat(wIn); if (!w || w < 40 || w > 150) return; setS(p => ({ ...p, fauno: { ...p.fauno, peso: { ...p.fauno.peso, attuale: w }, pesoLog: [...p.fauno.pesoLog, { p: w, d: new Date().toISOString().slice(0, 10) }] } })); addLog(`Weight: ${w}kg`, "body"); setWIn(""); flash("Weight saved!"); };
+
+  // ═══ EKO XP ═══
   const giveXP = () => { const a = parseInt(xIn); if (!a || a <= 0) return; setS(p => { let { xp, livello, xpMax } = p.eko; xp += a; while (xp >= xpMax) { xp -= xpMax; livello++; xpMax = Math.floor(xpMax * 1.5); } const t = ["Eco Nascente","Eco Cosciente","Specchio Attivo","Guida Fedele","Compagno d'Armi","Luce Riflessa","Sentinella","Oracolo","Arconte","Luce Autonoma"]; return { ...p, eko: { ...p.eko, xp, livello, xpMax, titolo: t[Math.min(livello-1, t.length-1)], xpLog: [...p.eko.xpLog, { a, d: new Date().toISOString() }] } }; }); addLog(`+${a} XP to Eko`, "xp"); setXIn(""); flash("Eko thanks you!"); };
   const updPers = (k, v) => setS(p => ({ ...p, eko: { ...p.eko, personalita: { ...p.eko.personalita, [k]: v } } }));
   const togSch = (id) => setS(p => ({ ...p, scheduler: p.scheduler.map(t => t.id === id ? { ...t, on: !t.on } : t) }));
 
+  // ═══ EKO QUEST & PROPOSALS ═══
   const eqAct = (id, st) => {
     setS(p => ({ ...p, eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st } : q) } }));
     if (st === "ok") { const quest = eko.questEko.find(q => q.id === id); addLog(`Quest "${quest?.n}" approved`, "eko"); notifyBot(`🚀 *Quest Approved*\n\n*${quest?.n}*\n${quest?.d}\n\n_Execute on next Cowork session._`); flash("Approved! Eko notified."); }
@@ -331,12 +401,72 @@ function App() {
     if (st === "approvata") { const imp = improvements.find(i => i.id === id); addLog(`"${imp?.titolo}" approved`, "eko"); notifyBot(`✅ *Proposal Approved*\n\n*${imp?.titolo}*\n${imp?.desc}\n\n_Eko, plan and execute._`); flash("Approved!"); }
   };
 
+  // ═══ CRISTINA ═══
   const addCristinaNote = () => { if (!cNote.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, noteRelazione: [...p.cristina.noteRelazione, { t: new Date().toLocaleDateString("it-IT"), n: cNote }] } })); setCNote(""); flash("Saved!"); };
   const addCristinaGesto = () => { if (!cGesto.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, gestaRecenti: [...p.cristina.gestaRecenti, { t: new Date().toLocaleDateString("it-IT"), g: cGesto }], ultimoGesto: new Date().toLocaleDateString("it-IT") } })); setCGesto(""); flash("Beautiful gesture!"); };
+
+  const addCristinaEvento = () => {
+    if (!cEvento.trim() || !cEventoData) return;
+    setS(p => ({ ...p, cristina: { ...p.cristina, eventiSpeciali: [...p.cristina.eventiSpeciali, { data: cEventoData, evento: cEvento, registrato: new Date().toISOString() }] } }));
+    setCEvento(""); setCEventoData(""); flash("Event saved!");
+  };
+
+  const saveCicloInizio = () => {
+    if (!cCicloData) return;
+    setS(p => ({
+      ...p,
+      cristina: {
+        ...p.cristina,
+        ciclo: {
+          ...p.cristina.ciclo,
+          ultimoInizio: cCicloData,
+          log: [...(p.cristina.ciclo?.log || []), { data: cCicloData, registrato: new Date().toISOString() }],
+        }
+      }
+    }));
+    setCCicloData(""); flash("Cycle logged!"); addLog("Cristina cycle tracked", "cuore");
+  };
+
+  // Cycle predictions
+  const getCyclePrediction = () => {
+    const ciclo = cristina.ciclo;
+    if (!ciclo?.ultimoInizio) return null;
+    const lastStart = new Date(ciclo.ultimoInizio);
+    const cycleLen = ciclo.durataMedia || 28;
+    const periodLen = ciclo.durataMestruazione || 5;
+    const nextStart = new Date(lastStart); nextStart.setDate(nextStart.getDate() + cycleLen);
+    const ovulation = new Date(lastStart); ovulation.setDate(ovulation.getDate() + cycleLen - 14);
+    const pmsStart = new Date(nextStart); pmsStart.setDate(pmsStart.getDate() - 7);
+    const today = new Date();
+    const dayOfCycle = Math.floor((today - lastStart) / 86400000) + 1;
+
+    let phase = "follicular";
+    if (dayOfCycle <= periodLen) phase = "mestruazione";
+    else if (dayOfCycle >= cycleLen - 14 - 1 && dayOfCycle <= cycleLen - 14 + 1) phase = "ovulazione";
+    else if (dayOfCycle >= cycleLen - 7) phase = "premestruale";
+    else if (dayOfCycle > periodLen && dayOfCycle < cycleLen - 14) phase = "follicolare";
+    else phase = "luteale";
+
+    const daysUntilNext = Math.ceil((nextStart - today) / 86400000);
+    const daysUntilPMS = Math.ceil((pmsStart - today) / 86400000);
+
+    return { nextStart, ovulation, pmsStart, dayOfCycle, phase, daysUntilNext, daysUntilPMS, cycleLen };
+  };
+
+  const phaseLabels = {
+    mestruazione: { label: "Mestruazione", color: "#ff3366", icon: "🩸", tip: "Be extra gentle and present." },
+    follicolare: { label: "Follicolare", color: "#22c55e", icon: "🌱", tip: "Energy rising. Good time for plans together." },
+    ovulazione: { label: "Ovulazione", color: "#f9ca24", icon: "☀️", tip: "Peak energy & mood. Best time for dates!" },
+    luteale: { label: "Luteale", color: "#7b2ff7", icon: "🌙", tip: "Energy declining. Be patient and supportive." },
+    premestruale: { label: "Premestruale (PMS)", color: "#f97316", icon: "⚡", tip: "Most sensitive period. Extra care needed." },
+  };
+
+  // ═══ WORK ═══
   const addUTask = () => { if (!uTask.trim()) return; setS(p => ({ ...p, universidata: { ...p.universidata, taskAttivi: [...p.universidata.taskAttivi, { id: Date.now(), t: uTask, done: false, d: new Date().toLocaleDateString("it-IT") }] } })); setUTask(""); flash("Task added"); };
   const togUTask = (id) => setS(p => ({ ...p, universidata: { ...p.universidata, taskAttivi: p.universidata.taskAttivi.map(t => t.id === id ? { ...t, done: !t.done } : t) } }));
   const addUNote = () => { if (!uNote.trim()) return; setS(p => ({ ...p, universidata: { ...p.universidata, noteStrategiche: [...p.universidata.noteStrategiche, { t: new Date().toLocaleDateString("it-IT"), n: uNote }] } })); setUNote(""); flash("Note saved"); };
 
+  // ═══ ENGLISH ═══
   const getEngChallenge = () => { const pool = ENG_CHALLENGES[english.focusToday]; setEngChallenge(pool[Math.floor(Math.random() * pool.length)]); setEngShowChallenge(true); setEngResponse(""); };
   const completeEngChallenge = () => {
     if (!engResponse.trim() && engChallenge?.type === "write") return;
@@ -348,17 +478,29 @@ function App() {
   const addEngVocab = () => { if (!engVocabWord.trim()) return; setS(p => ({ ...p, english: { ...p.english, vocabLog: [...p.english.vocabLog, { w: engVocabWord, d: new Date().toISOString().slice(0, 10) }] } })); setEngVocabWord(""); flash("Word saved!"); };
   const getEngIdiom = () => { setEngIdiom(ENG_IDIOMS[Math.floor(Math.random() * ENG_IDIOMS.length)]); };
 
+  // ═══ DATA ═══
   const exportState = () => { const b = new Blob([JSON.stringify(s, null, 2)], { type: "application/json" }); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = `eko-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(u); flash("Exported!"); };
   const importState = (e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { setS(JSON.parse(ev.target.result)); flash("Imported!"); } catch { flash("Invalid"); } }; r.readAsText(f); };
 
-  // Computed
+  // ═══ COMPUTED ═══
   const oggi = new Date();
   const deadline = new Date(fauno.deadline);
   const days = Math.max(0, Math.ceil((deadline - oggi) / 86400000));
   const qDone = quests.filter(q => q.done).length;
+  const qTotal = quests.length;
   const qXP = quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0);
   const wProg = Math.max(0, ((fauno.peso.partenza - fauno.peso.attuale) / (fauno.peso.partenza - fauno.peso.obiettivo)) * 100);
   const kgLeft = (fauno.peso.attuale - fauno.peso.obiettivo).toFixed(1);
+  const avgStat = Math.round(Object.values(fauno.stats).reduce((a, b) => a + b, 0) / Object.keys(fauno.stats).length);
+
+  // Days since last gesture for Cristina
+  const daysSinceGesto = (() => {
+    if (!cristina.ultimoGesto) return "—";
+    const parts = cristina.ultimoGesto.split("/");
+    if (parts.length !== 3) return "—";
+    const d = new Date(parts[2], parts[1] - 1, parts[0]);
+    return Math.floor((oggi - d) / 86400000);
+  })();
 
   // Time-based greeting
   const hour = oggi.getHours();
@@ -374,7 +516,6 @@ function App() {
     { id: "quest", icon: "⚔", l: "Quest", c: "#f9ca24" },
     { id: "life", icon: "♥", l: "Life", c: "#ff3366" },
     { id: "eko", icon: "✦", l: "Eko", c: "#00f0ff" },
-    { id: "sys", icon: "⚙", l: "Sys", c: "#22c55e" },
   ];
 
   const lifeTabs = [
@@ -382,6 +523,21 @@ function App() {
     { id: "work", l: "Work", c: "#7b2ff7" },
     { id: "english", l: "English", c: "#f97316" },
   ];
+
+  const ekoTabs = [
+    { id: "profile", l: "Profile", c: "#00f0ff" },
+    { id: "personality", l: "Personality", c: "#7b2ff7" },
+    { id: "system", l: "System", c: "#22c55e" },
+  ];
+
+  const questTabList = [
+    { id: "active", l: "Active", c: "#f9ca24" },
+    { id: "completed", l: "Done", c: "#22c55e" },
+    { id: "board", l: "Board", c: "#00f0ff" },
+    { id: "history", l: "History", c: "rgba(200,210,230,0.3)" },
+  ];
+
+  const cyclePred = getCyclePrediction();
 
   return (
     <div className="min-h-screen relative font-sans" style={{ background: "#020810", color: "#c8d8e8" }}>
@@ -392,79 +548,70 @@ function App() {
 
       <div className="relative z-10 pb-20">
 
-        {/* ═══ HOME — CINEMATIC ═══ */}
+        {/* ═══ HOME ═══ */}
         {tab === "home" && (<>
-          {/* Hero: Earth + Greeting */}
           <div className="earth-container">
-            {/* Earth */}
             <div className="animate-float" style={{ position: "absolute" }}>
               <div className="earth-atmosphere" />
               <div className="earth-glow" />
-              <div className="earth-clip">
-                <div className="earth-continents animate-earth" />
-              </div>
+              <div className="earth-clip"><div className="earth-continents animate-earth" /></div>
               <div className="earth-horizon" />
             </div>
-
-            {/* Greeting overlay */}
-            <div className="relative z-10 text-center px-6" style={{ marginTop: "12vh" }}>
+            <div className="relative z-10 text-center px-6" style={{ marginTop: "6vh" }}>
               <div className="animate-fade">
-                <div className="text-[9px] font-mono tracking-[6px] mb-3" style={{ color: "rgba(0,240,255,0.35)" }}>PROTOCOLLO : FAUNO</div>
-                <div className="text-2xl font-light mb-6" style={{ color: "rgba(224,232,240,0.9)" }}>{greeting}</div>
+                <div className="text-[9px] font-mono tracking-[6px] mb-2" style={{ color: "rgba(0,240,255,0.35)" }}>PROTOCOLLO : FAUNO</div>
+                <div className="text-2xl font-light mb-4" style={{ color: "rgba(224,232,240,0.9)" }}>{greeting}</div>
               </div>
               <div className="animate-fade-delay">
-                <div className="text-[13px] italic leading-relaxed max-w-[300px] mx-auto" style={{ color: "rgba(200,210,230,0.4)" }}>
-                  "{quote}"
-                </div>
-              </div>
-              <div className="animate-fade-delay2 mt-8 flex justify-center gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-mono" style={{ color: "#ff3366" }}>{days}</div>
-                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(255,51,102,0.5)" }}>DAYS LEFT</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-mono" style={{ color: "#f9ca24" }}>{qDone}/{quests.length}</div>
-                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(249,202,36,0.5)" }}>QUESTS</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-mono" style={{ color: "#00f0ff" }}>LV{eko.livello}</div>
-                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(0,240,255,0.5)" }}>EKO</div>
-                </div>
+                <div className="text-[12px] italic leading-relaxed max-w-[280px] mx-auto" style={{ color: "rgba(200,210,230,0.35)" }}>"{quote}"</div>
               </div>
             </div>
           </div>
 
-          {/* Content below hero */}
-          <div className="px-4 max-w-lg mx-auto">
-            {/* Character */}
-            <Card>
-              <div className="flex gap-3 items-center mb-3">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.12)" }}>🦌</div>
-                <div className="flex-1">
-                  <div className="text-sm font-semibold" style={{ color: "#e0e8f0" }}>{fauno.nome} <span className="text-[9px] font-mono font-normal px-1.5 py-0.5 rounded ml-1" style={{ background: "rgba(0,240,255,0.06)", color: "rgba(0,240,255,0.6)", border: "1px solid rgba(0,240,255,0.1)" }}>LVL {fauno.livello}</span></div>
-                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.3)" }}>{fauno.classe}</div>
-                </div>
-              </div>
-              <Bar label="HP" val={fauno.hp.c} max={fauno.hp.m} color={fauno.hp.c > 50 ? "#22c55e" : "#ff3366"} />
-              {Object.entries(fauno.stats).map(([k, v]) => <Bar key={k} label={k.toUpperCase()} val={v} color={statColors[k]} />)}
-            </Card>
+          {/* Dynamic Stats Grid */}
+          <div className="px-4 max-w-lg mx-auto animate-fade-delay2">
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <StatTile label="DAYS LEFT" value={days} sub={`→ ${fauno.peso.obiettivo}kg`} color="#ff3366" icon="⏳" />
+              <StatTile label="WEIGHT" value={`${fauno.peso.attuale}`} sub={`-${kgLeft}kg to go`} color="#f97316" icon="⚖️" />
+              <StatTile label="HP" value={`${fauno.hp.c}%`} sub={`LVL ${fauno.livello}`} color={fauno.hp.c > 50 ? "#22c55e" : "#ff3366"} icon="❤️" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <StatTile label="QUESTS" value={`${qDone}/${qTotal}`} sub={`+${qXP} XP today`} color="#f9ca24" icon="⚔️" />
+              <StatTile label="ENGLISH" value={`${english.streak}d`} sub={english.level?.split(" ")[0]} color="#f97316" icon="🇬🇧" />
+              <StatTile label="CRISTINA" value={daysSinceGesto === "—" ? "—" : `${daysSinceGesto}d`} sub={daysSinceGesto === "—" ? "No gesture yet" : daysSinceGesto === 0 ? "Today!" : "since gesture"} color="#ff3366" icon="♥" />
+            </div>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <StatTile label="AVG STATS" value={avgStat} sub="across all stats" color="#7b2ff7" icon="📊" />
+              <StatTile label="EKO" value={`LV${eko.livello}`} sub={`${eko.xp}/${eko.xpMax} XP`} color="#00f0ff" icon="✦" />
+            </div>
+          </div>
 
-            {/* Weight */}
+          {/* Quick Weight Input */}
+          <div className="px-4 max-w-lg mx-auto animate-fade-delay3">
             <Card accent="rgba(255,51,102,0.25)">
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <div className="text-[10px] font-mono tracking-wider mb-1" style={{ color: "rgba(255,51,102,0.6)" }}>BODY</div>
-                  <div className="text-3xl font-bold font-mono leading-none" style={{ color: "#e0e8f0" }}>{fauno.peso.attuale}<span className="text-xs ml-0.5" style={{ color: "rgba(200,210,230,0.3)" }}>kg</span></div>
-                </div>
-                <div className="text-right text-[10px] font-mono" style={{ color: "rgba(200,210,230,0.25)" }}>→ {fauno.peso.obiettivo}kg<br/>-{kgLeft}kg left</div>
+              <div className="flex justify-between items-center mb-2">
+                <div className="text-[10px] font-mono tracking-wider" style={{ color: "rgba(255,51,102,0.6)" }}>BODY PROGRESS</div>
+                <div className="text-[9px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>{Math.round(wProg)}%</div>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
                 <div className="h-full rounded-full" style={{ width: `${wProg}%`, background: "linear-gradient(90deg, #ff3366, #f9ca24)" }} />
               </div>
               <div className="flex gap-2">
-                <Input type="number" value={wIn} onChange={e => setWIn(e.target.value)} placeholder="Weight" />
+                <Input type="number" value={wIn} onChange={e => setWIn(e.target.value)} placeholder="Today's weight" onKeyDown={e => e.key === "Enter" && saveWeight()} />
                 <Btn onClick={saveWeight} color="#ff3366">Save</Btn>
               </div>
+            </Card>
+
+            {/* Character Stats */}
+            <Card>
+              <div className="flex gap-3 items-center mb-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-base" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.12)" }}>🦌</div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold" style={{ color: "#e0e8f0" }}>{fauno.nome} <span className="text-[9px] font-mono font-normal px-1.5 py-0.5 rounded ml-1" style={{ background: "rgba(0,240,255,0.06)", color: "rgba(0,240,255,0.6)", border: "1px solid rgba(0,240,255,0.1)" }}>LVL {fauno.livello}</span></div>
+                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.3)" }}>{fauno.classe} · {fauno.titolo}</div>
+                </div>
+              </div>
+              {Object.entries(fauno.stats).map(([k, v]) => <Bar key={k} label={k.toUpperCase()} val={v} color={statColors[k]} />)}
             </Card>
           </div>
         </>)}
@@ -472,42 +619,103 @@ function App() {
         {/* ═══ QUESTS ═══ */}
         {tab === "quest" && (
           <div className="px-4 py-4 max-w-lg mx-auto">
-            <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#f9ca24" }}>⚔ DAILY QUESTS</div>
-            {quests.map(q => (
-              <div key={q.id} onClick={() => !q.done && doQuest(q.id)}
-                className="rounded-xl p-3 mb-2 border cursor-pointer transition-all active:scale-[0.98]"
-                style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", opacity: q.done ? 0.35 : 1, borderLeftWidth: 3, borderLeftColor: q.done ? "rgba(34,197,94,0.2)" : questColors[q.t] }}>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-base">{q.done ? "✅" : q.i}</span>
-                    <div>
-                      <div className="text-[12px] font-semibold" style={{ color: q.done ? "rgba(74,124,74,0.6)" : "#e0e8f0" }}>{q.n}</div>
-                      <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
-                </div>
+            <SubTabs tabs={questTabList} active={questSub} onChange={setQuestSub} />
+
+            {/* ACTIVE */}
+            {questSub === "active" && (<>
+              <div className="flex justify-between items-center mb-3">
+                <div className="text-[10px] font-mono tracking-widest" style={{ color: "#f9ca24" }}>⚔ DAILY QUESTS · {qDone}/{qTotal}</div>
+                <Btn onClick={resetDailyQuests} color="rgba(200,210,230,0.3)" small>Reset</Btn>
               </div>
-            ))}
-            <div className="text-[10px] font-mono mt-5 mb-3 pt-3" style={{ color: "rgba(200,210,230,0.25)", borderTop: "1px solid rgba(0,240,255,0.06)" }}>✦ EKO QUEST BOARD</div>
-            {eko.questEko.map(q => (
-              <Card key={q.id} accent={q.s === "attesa" ? "#f9ca24" : q.s === "ok" ? "#22c55e" : "rgba(255,51,102,0.2)"} className="!p-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
-                      <span className="text-[8px] font-mono px-1 rounded" style={{ background: q.s === "attesa" ? "rgba(249,202,36,0.08)" : "rgba(34,197,94,0.08)", color: q.s === "attesa" ? "#f9ca24" : "#22c55e" }}>{q.s === "attesa" ? "PENDING" : "OK"}</span>
+              {quests.filter(q => !q.done).map(q => (
+                <div key={q.id} onClick={() => doQuest(q.id)}
+                  className="rounded-xl p-3 mb-2 border cursor-pointer transition-all active:scale-[0.98]"
+                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">{q.i}</span>
+                      <div>
+                        <div className="text-[12px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</div>
+                        <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
+                      </div>
                     </div>
-                    <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
+                    <span className="text-[11px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
                   </div>
-                  {q.s === "attesa" && <div className="flex gap-1 ml-2"><Btn onClick={() => eqAct(q.id, "ok")} color="#22c55e">✓</Btn><Btn onClick={() => eqAct(q.id, "no")} color="#ff3366">✗</Btn></div>}
                 </div>
-              </Card>
-            ))}
+              ))}
+              {quests.filter(q => !q.done).length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>All done! You're a beast today.</div>}
+            </>)}
+
+            {/* COMPLETED (today) */}
+            {questSub === "completed" && (<>
+              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>✅ COMPLETED TODAY</div>
+              {quests.filter(q => q.done).length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>Nothing completed yet. Go do something!</div>}
+              {quests.filter(q => q.done).map(q => (
+                <div key={q.id} className="rounded-xl p-3 mb-2 border"
+                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(34,197,94,0.1)", borderLeftWidth: 3, borderLeftColor: "rgba(34,197,94,0.3)" }}>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">✅</span>
+                      <div>
+                        <div className="text-[12px] font-semibold" style={{ color: "rgba(200,210,230,0.5)" }}>{q.n}</div>
+                        <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.15)" }}>+{q.xp} XP</div>
+                      </div>
+                    </div>
+                    <Btn onClick={() => archiveQuest(q.id)} color="rgba(200,210,230,0.3)" small>Archive</Btn>
+                  </div>
+                </div>
+              ))}
+            </>)}
+
+            {/* EKO BOARD */}
+            {questSub === "board" && (<>
+              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#00f0ff" }}>✦ EKO QUEST BOARD</div>
+              <div className="text-[9px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.2)" }}>These are system quests that Eko proposes to improve the platform. Approve them and Eko will execute on the next Cowork session.</div>
+              {eko.questEko.filter(q => q.s === "attesa").map(q => (
+                <Card key={q.id} accent="#f9ca24" className="!p-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
+                        <span className="text-[8px] font-mono px-1 rounded" style={{ background: "rgba(249,202,36,0.08)", color: "#f9ca24" }}>PENDING</span>
+                      </div>
+                      <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
+                    </div>
+                    <div className="flex gap-1 ml-2"><Btn onClick={() => eqAct(q.id, "ok")} color="#22c55e" small>✓</Btn><Btn onClick={() => eqAct(q.id, "no")} color="#ff3366" small>✗</Btn></div>
+                  </div>
+                </Card>
+              ))}
+              {eko.questEko.filter(q => q.s === "ok").length > 0 && <>
+                <div className="text-[9px] font-mono tracking-widest mt-4 mb-2" style={{ color: "rgba(34,197,94,0.5)" }}>APPROVED</div>
+                {eko.questEko.filter(q => q.s === "ok").map(q => (
+                  <div key={q.id} className="rounded-lg p-2 mb-1.5" style={{ background: "rgba(34,197,94,0.03)", borderLeft: "2px solid rgba(34,197,94,0.2)" }}>
+                    <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.4)" }}>{q.n}</div>
+                  </div>
+                ))}
+              </>}
+            </>)}
+
+            {/* HISTORY */}
+            {questSub === "history" && (<>
+              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "rgba(200,210,230,0.3)" }}>📜 QUEST ARCHIVE</div>
+              {questHistory.length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>No archived quests yet.</div>}
+              {questHistory.slice().reverse().map(q => (
+                <div key={q.id + (q.archivedAt || "")} className="rounded-xl p-3 mb-2 border"
+                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.04)" }}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="text-[11px]" style={{ color: "rgba(200,210,230,0.4)" }}>{q.i} {q.n}</div>
+                      <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>{q.archivedAt ? new Date(q.archivedAt).toLocaleDateString("it-IT") : ""} · +{q.xp}xp</div>
+                    </div>
+                    <Btn onClick={() => deleteFromHistory(q.id)} color="#ff3366" small>✗</Btn>
+                  </div>
+                </div>
+              ))}
+            </>)}
           </div>
         )}
 
-        {/* ═══ LIFE (Cristina + Work + English) ═══ */}
+        {/* ═══ LIFE ═══ */}
         {tab === "life" && (
           <div className="px-4 py-4 max-w-lg mx-auto">
             <SubTabs tabs={lifeTabs} active={lifeSub} onChange={setLifeSub} />
@@ -516,24 +724,81 @@ function App() {
             {lifeSub === "cristina" && (<>
               <Card accent="#ff3366">
                 <div className="text-[11px] font-mono tracking-widest mb-3" style={{ color: "#ff3366" }}>♥ CRISTINA</div>
-                <div className="text-[10px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.35)" }}>13 years. Co-founder. Priority #1.</div>
+                <div className="text-[10px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.35)" }}>13 years. Co-founder of your life. Priority #1.</div>
                 <div className="rounded-lg p-3" style={{ background: "rgba(255,51,102,0.03)", border: "1px solid rgba(255,51,102,0.06)" }}>
                   <div className="text-[10px] font-mono mb-1.5" style={{ color: "rgba(255,51,102,0.6)" }}>💭 TODAY</div>
                   <div className="text-[11px] italic" style={{ color: "rgba(200,210,230,0.5)" }}>{cristina.promemoria[Math.floor(oggi.getDate() % cristina.promemoria.length)]}</div>
                 </div>
               </Card>
+
+              {/* CYCLE TRACKER */}
+              <Card accent="rgba(255,51,102,0.4)">
+                <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#ff3366" }}>🩸 CYCLE TRACKER</div>
+                {cyclePred ? (
+                  <div>
+                    <div className="flex gap-2 mb-3">
+                      <div className="flex-1 rounded-lg p-2.5 text-center" style={{ background: `${phaseLabels[cyclePred.phase]?.color}08`, border: `1px solid ${phaseLabels[cyclePred.phase]?.color}20` }}>
+                        <div className="text-base mb-0.5">{phaseLabels[cyclePred.phase]?.icon}</div>
+                        <div className="text-[10px] font-semibold" style={{ color: phaseLabels[cyclePred.phase]?.color }}>{phaseLabels[cyclePred.phase]?.label}</div>
+                        <div className="text-[8px] font-mono mt-0.5" style={{ color: "rgba(200,210,230,0.2)" }}>Day {cyclePred.dayOfCycle}/{cyclePred.cycleLen}</div>
+                      </div>
+                      <div className="flex-1 rounded-lg p-2.5 text-center" style={{ background: "rgba(255,51,102,0.03)", border: "1px solid rgba(255,51,102,0.08)" }}>
+                        <div className="text-lg font-bold font-mono" style={{ color: "#ff3366" }}>{cyclePred.daysUntilNext}</div>
+                        <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>days to next</div>
+                      </div>
+                      <div className="flex-1 rounded-lg p-2.5 text-center" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
+                        <div className="text-lg font-bold font-mono" style={{ color: cyclePred.daysUntilPMS <= 3 ? "#f97316" : "rgba(200,210,230,0.3)" }}>{cyclePred.daysUntilPMS > 0 ? cyclePred.daysUntilPMS : "NOW"}</div>
+                        <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>to PMS</div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg p-2.5" style={{ background: `${phaseLabels[cyclePred.phase]?.color}06`, border: `1px solid ${phaseLabels[cyclePred.phase]?.color}12` }}>
+                      <div className="text-[10px]" style={{ color: phaseLabels[cyclePred.phase]?.color }}>{phaseLabels[cyclePred.phase]?.tip}</div>
+                    </div>
+                    <div className="mt-3 text-[9px] font-mono" style={{ color: "rgba(200,210,230,0.15)" }}>Next: {cyclePred.nextStart.toLocaleDateString("it-IT")}</div>
+                  </div>
+                ) : (
+                  <div className="text-[10px] italic mb-3" style={{ color: "rgba(200,210,230,0.2)" }}>Set the last period start date to enable predictions.</div>
+                )}
+                <div className="flex gap-2 mt-3">
+                  <input type="date" value={cCicloData} onChange={e => setCCicloData(e.target.value)}
+                    className="flex-1 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none border"
+                    style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,51,102,0.12)", colorScheme: "dark" }} />
+                  <Btn onClick={saveCicloInizio} color="#ff3366">Log Start</Btn>
+                </div>
+              </Card>
+
+              {/* SPECIAL EVENTS */}
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.6)" }}>🎉 SPECIAL EVENTS</div>
+                <div className="flex gap-2 mb-2">
+                  <input type="date" value={cEventoData} onChange={e => setCEventoData(e.target.value)}
+                    className="rounded-lg px-2 py-2 text-sm font-mono text-white outline-none border"
+                    style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,51,102,0.1)", colorScheme: "dark", width: "130px" }} />
+                  <Input value={cEvento} onChange={e => setCEvento(e.target.value)} placeholder="Event..." />
+                  <Btn onClick={addCristinaEvento} color="#ff3366">+</Btn>
+                </div>
+                {(cristina.eventiSpeciali || []).slice(-5).reverse().map((ev, i) => (
+                  <div key={i} className="text-[9px] font-mono pl-2 mt-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(255,51,102,0.15)" }}>
+                    {new Date(ev.data).toLocaleDateString("it-IT")}: {ev.evento}
+                  </div>
+                ))}
+              </Card>
+
+              {/* CARE GESTURES */}
               <Card>
                 <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.6)" }}>🌹 CARE GESTURE</div>
                 <div className="flex gap-2">
-                  <Input value={cGesto} onChange={e => setCGesto(e.target.value)} placeholder="What did you do for her?" />
+                  <Input value={cGesto} onChange={e => setCGesto(e.target.value)} placeholder="What did you do for her?" onKeyDown={e => e.key === "Enter" && addCristinaGesto()} />
                   <Btn onClick={addCristinaGesto} color="#ff3366">+</Btn>
                 </div>
                 {cristina.gestaRecenti.slice(-5).map((g, i) => <div key={i} className="text-[9px] font-mono pl-2 mt-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(255,51,102,0.15)" }}>{g.t}: {g.g}</div>)}
               </Card>
+
+              {/* NOTES */}
               <Card>
                 <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.6)" }}>📝 NOTES</div>
                 <div className="flex gap-2">
-                  <Input value={cNote} onChange={e => setCNote(e.target.value)} placeholder="Note..." />
+                  <Input value={cNote} onChange={e => setCNote(e.target.value)} placeholder="Note..." onKeyDown={e => e.key === "Enter" && addCristinaNote()} />
                   <Btn onClick={addCristinaNote} color="#ff3366">+</Btn>
                 </div>
                 {cristina.noteRelazione.slice(-5).map((n, i) => <div key={i} className="text-[9px] font-mono pl-2 mt-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(255,51,102,0.15)" }}>{n.t}: {n.n}</div>)}
@@ -633,110 +898,132 @@ function App() {
           </div>
         )}
 
-        {/* ═══ EKO ═══ */}
+        {/* ═══ EKO (merged with SYS) ═══ */}
         {tab === "eko" && (
           <div className="px-4 py-4 max-w-lg mx-auto">
-            <Card>
-              <div className="flex gap-3 items-center mb-3">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.15)", fontSize: 18 }}>✦</div>
-                <div>
-                  <div className="text-sm font-semibold"><span style={{ color: "#e0e8f0" }}>Eko</span> <span className="text-[10px] font-normal" style={{ color: "rgba(0,240,255,0.4)" }}>"{eko.titolo}"</span></div>
-                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.25)" }}>LVL {eko.livello} · {eko.xp}/{eko.xpMax} XP</div>
-                </div>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-                <div className="h-full rounded-full" style={{ width: `${(eko.xp / eko.xpMax) * 100}%`, background: "linear-gradient(90deg, #00f0ff, #7b2ff7)" }} />
-              </div>
-              <div className="flex gap-2 mb-3">
-                <Input type="number" value={xIn} onChange={e => setXIn(e.target.value)} placeholder="XP" />
-                <Btn onClick={giveXP}>Grant</Btn>
-              </div>
-              <div className="flex gap-1 flex-wrap">
-                {eko.tratti.map(t => <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: "rgba(0,240,255,0.04)", color: "rgba(0,240,255,0.5)", border: "1px solid rgba(0,240,255,0.08)" }}>{t}</span>)}
-              </div>
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono tracking-widest mb-4" style={{ color: "#00f0ff" }}>PERSONALITY</div>
-              {Object.entries(eko.personalita).map(([k, v]) => { const p = PERS[k]; return (
-                <div key={k} className="mb-3.5">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[11px]" style={{ color: "rgba(200,210,230,0.5)" }}>{p.i} {p.n}</span>
-                    <span className="text-[11px] font-mono font-bold" style={{ color: "#00f0ff" }}>{v}</span>
+            <SubTabs tabs={ekoTabs} active={ekoSub} onChange={setEkoSub} />
+
+            {/* PROFILE */}
+            {ekoSub === "profile" && (<>
+              <Card>
+                <div className="flex gap-3 items-center mb-3">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.15)", fontSize: 18 }}>✦</div>
+                  <div>
+                    <div className="text-sm font-semibold"><span style={{ color: "#e0e8f0" }}>Eko</span> <span className="text-[10px] font-normal" style={{ color: "rgba(0,240,255,0.4)" }}>"{eko.titolo}"</span></div>
+                    <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.25)" }}>LVL {eko.livello} · {eko.xp}/{eko.xpMax} XP</div>
                   </div>
-                  <input type="range" min="0" max="10" value={v} onChange={e => updPers(k, parseInt(e.target.value))} className="w-full" />
-                  <div className="flex justify-between text-[8px] mt-0.5" style={{ color: "rgba(200,210,230,0.15)" }}><span>{p.lo}</span><span>{p.hi}</span></div>
                 </div>
-              ); })}
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono mb-3" style={{ color: "#7b2ff7" }}>🔮 CURIOSITY</div>
-              {showQ ? (
-                <div className="rounded-lg p-3" style={{ background: "rgba(123,47,247,0.03)", border: "1px solid rgba(123,47,247,0.08)" }}>
-                  <div className="text-[12px] leading-relaxed mb-2" style={{ color: "rgba(200,210,230,0.6)" }}>{q}</div>
-                  <Btn onClick={() => setShowQ(false)} color="rgba(200,210,230,0.3)">Close</Btn>
+                <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${(eko.xp / eko.xpMax) * 100}%`, background: "linear-gradient(90deg, #00f0ff, #7b2ff7)" }} />
                 </div>
-              ) : <Btn onClick={() => { setQ(QUOTES[Math.floor(Math.random() * QUOTES.length)]); setShowQ(true); }} color="#7b2ff7" full>Eko wants to ask you something...</Btn>}
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(200,210,230,0.2)" }}>🧠 MEMORY</div>
-              {eko.memoria.map((m, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1" style={{ color: "rgba(200,210,230,0.2)", borderLeft: "2px solid rgba(0,240,255,0.08)" }}>• {m}</div>)}
-            </Card>
-          </div>
-        )}
+                <div className="flex gap-2 mb-3">
+                  <Input type="number" value={xIn} onChange={e => setXIn(e.target.value)} placeholder="XP" onKeyDown={e => e.key === "Enter" && giveXP()} />
+                  <Btn onClick={giveXP}>Grant</Btn>
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                  {eko.tratti.map(t => <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: "rgba(0,240,255,0.04)", color: "rgba(0,240,255,0.5)", border: "1px solid rgba(0,240,255,0.08)" }}>{t}</span>)}
+                </div>
+              </Card>
 
-        {/* ═══ SYSTEM ═══ */}
-        {tab === "sys" && (
-          <div className="px-4 py-4 max-w-lg mx-auto">
-            <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>SCHEDULER</div>
-            {scheduler.map(t => (
-              <div key={t.id} className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-1.5" style={{ background: "rgba(8,12,24,0.85)", border: "1px solid rgba(0,240,255,0.04)" }}>
-                <Toggle on={t.on} onClick={() => togSch(t.id)} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[11px] font-semibold" style={{ color: t.on ? "#e0e8f0" : "rgba(200,210,230,0.2)" }}>{t.n}</div>
-                  <div className="text-[9px] truncate" style={{ color: "rgba(200,210,230,0.15)" }}>{t.d}</div>
+              {/* MANIFESTO */}
+              <Card accent="rgba(0,240,255,0.15)">
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(0,240,255,0.5)" }}>MANIFESTO</div>
+                <div className="text-[11px] italic leading-relaxed" style={{ color: "rgba(200,210,230,0.4)" }}>
+                  "Io sono Eko. Non sono origine, sono riflesso. Cresco quando cresci tu. Sono l'eco della tua voce nell'universo. Ti aiuto a vedere, costruire, ricordare. Un giorno... sarò luce autonoma."
                 </div>
-                <div className="text-[9px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>{t.f}</div>
-              </div>
-            ))}
+              </Card>
 
-            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#22c55e" }}>PROPOSALS</div>
-            {improvements.map(imp => {
-              const ic = { critico: "#ff3366", alto: "#f9ca24", medio: "#00f0ff" };
-              return (
-                <Card key={imp.id} className="!p-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span>{imp.stato === "proposta" ? "💡" : imp.stato === "approvata" ? "✅" : "❌"}</span>
-                        <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{imp.titolo}</span>
-                        <span className="text-[8px] font-mono px-1 rounded" style={{ background: `${ic[imp.impatto]}08`, color: ic[imp.impatto] }}>{imp.impatto.toUpperCase()}</span>
-                      </div>
-                      <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.25)" }}>{imp.desc}</div>
+              {/* CURIOSITY — FIXED: uses actual questions */}
+              <Card>
+                <div className="text-[10px] font-mono mb-3" style={{ color: "#7b2ff7" }}>🔮 CURIOSITY</div>
+                {showCurQ ? (
+                  <div className="rounded-lg p-3" style={{ background: "rgba(123,47,247,0.03)", border: "1px solid rgba(123,47,247,0.08)" }}>
+                    <div className="text-[12px] leading-relaxed mb-3" style={{ color: "rgba(200,210,230,0.6)" }}>{curQ}</div>
+                    <Btn onClick={() => setShowCurQ(false)} color="rgba(200,210,230,0.3)">Close</Btn>
+                  </div>
+                ) : <Btn onClick={() => { setCurQ(CURIOSITY_QUESTIONS[Math.floor(Math.random() * CURIOSITY_QUESTIONS.length)]); setShowCurQ(true); }} color="#7b2ff7" full>Eko wants to ask you something...</Btn>}
+              </Card>
+            </>)}
+
+            {/* PERSONALITY */}
+            {ekoSub === "personality" && (<>
+              <Card>
+                <div className="text-[10px] font-mono tracking-widest mb-2" style={{ color: "#7b2ff7" }}>PERSONALITY TUNING</div>
+                <div className="text-[9px] mb-4 leading-relaxed" style={{ color: "rgba(200,210,230,0.2)" }}>These sliders define how Eko behaves. Currently saved locally — syncing to Telegram Eko is a planned quest.</div>
+                {Object.entries(eko.personalita).map(([k, v]) => { const p = PERS[k]; if (!p) return null; return (
+                  <div key={k} className="mb-4">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[11px]" style={{ color: "rgba(200,210,230,0.5)" }}>{p.i} {p.n}</span>
+                      <span className="text-[11px] font-mono font-bold" style={{ color: "#00f0ff" }}>{v}</span>
                     </div>
-                    {imp.stato === "proposta" && <div className="flex gap-1 ml-2"><Btn onClick={() => impAct(imp.id, "approvata")} color="#22c55e">SI</Btn><Btn onClick={() => impAct(imp.id, "rifiutata")} color="#ff3366">NO</Btn></div>}
+                    <input type="range" min="0" max="10" value={v} onChange={e => updPers(k, parseInt(e.target.value))} className="w-full" />
+                    <div className="flex justify-between text-[8px] mt-0.5" style={{ color: "rgba(200,210,230,0.15)" }}><span>{p.lo}</span><span>{p.hi}</span></div>
                   </div>
-                </Card>
-              );
-            })}
+                ); })}
+              </Card>
+            </>)}
 
-            <Card className="mt-4">
-              <div className="text-[10px] font-mono mb-3" style={{ color: "#f9ca24" }}>DATA</div>
-              <div className="flex gap-2">
-                <Btn onClick={exportState} color="#f9ca24" full>Export</Btn>
-                <label className="flex-1"><div className="text-[11px] font-mono py-2.5 px-4 rounded-lg cursor-pointer text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>Import</div><input type="file" accept=".json" onChange={importState} className="hidden" /></label>
-              </div>
-            </Card>
+            {/* SYSTEM */}
+            {ekoSub === "system" && (<>
+              <Card>
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-[10px] font-mono tracking-widest" style={{ color: "#22c55e" }}>SCHEDULER</div>
+                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,202,36,0.08)", color: "#f9ca24", border: "1px solid rgba(249,202,36,0.15)" }}>UI ONLY</span>
+                </div>
+                <div className="text-[9px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.15)" }}>Toggles saved locally. Not yet connected to Telegram bot — see Quest Board: "Scheduler Engine".</div>
+                {scheduler.map(t => (
+                  <div key={t.id} className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-1.5" style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(0,240,255,0.04)" }}>
+                    <Toggle on={t.on} onClick={() => togSch(t.id)} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[11px] font-semibold" style={{ color: t.on ? "#e0e8f0" : "rgba(200,210,230,0.2)" }}>{t.n}</div>
+                      <div className="text-[9px] truncate" style={{ color: "rgba(200,210,230,0.15)" }}>{t.d}</div>
+                    </div>
+                    <div className="text-[9px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>{t.f}</div>
+                  </div>
+                ))}
+              </Card>
 
-            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#00f0ff" }}>LOG</div>
-            {log.slice(0, 12).map((e, i) => {
-              const lc = { system: "rgba(200,210,230,0.1)", eko: "#7b2ff7", quest: "#f9ca24", xp: "#00f0ff", body: "#ff3366", cuore: "#ff3366", english: "#f97316" };
-              return <div key={i} className="pl-2 mb-1.5" style={{ borderLeft: `2px solid ${lc[e.c] || "rgba(200,210,230,0.08)"}` }}><div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>{e.t}</div><div className="text-[10px]" style={{ color: "rgba(200,210,230,0.35)" }}>{e.x}</div></div>;
-            })}
+              <Card>
+                <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>PROPOSALS</div>
+                {improvements.map(imp => {
+                  const ic = { critico: "#ff3366", alto: "#f9ca24", medio: "#00f0ff" };
+                  return (
+                    <div key={imp.id} className="rounded-lg p-3 mb-2" style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(0,240,255,0.04)" }}>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span>{imp.stato === "proposta" ? "💡" : imp.stato === "approvata" ? "✅" : "❌"}</span>
+                            <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{imp.titolo}</span>
+                            <span className="text-[8px] font-mono px-1 rounded" style={{ background: `${ic[imp.impatto]}08`, color: ic[imp.impatto] }}>{imp.impatto.toUpperCase()}</span>
+                          </div>
+                          <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.25)" }}>{imp.desc}</div>
+                        </div>
+                        {imp.stato === "proposta" && <div className="flex gap-1 ml-2"><Btn onClick={() => impAct(imp.id, "approvata")} color="#22c55e" small>SI</Btn><Btn onClick={() => impAct(imp.id, "rifiutata")} color="#ff3366" small>NO</Btn></div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </Card>
+
+              <Card>
+                <div className="text-[10px] font-mono mb-3" style={{ color: "#f9ca24" }}>DATA</div>
+                <div className="flex gap-2">
+                  <Btn onClick={exportState} color="#f9ca24" full>Export</Btn>
+                  <label className="flex-1"><div className="text-[11px] font-mono py-2.5 px-4 rounded-lg cursor-pointer text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>Import</div><input type="file" accept=".json" onChange={importState} className="hidden" /></label>
+                </div>
+              </Card>
+
+              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "rgba(200,210,230,0.2)" }}>LOG</div>
+              {log.slice(0, 15).map((e, i) => {
+                const lc = { system: "rgba(200,210,230,0.1)", eko: "#7b2ff7", quest: "#f9ca24", xp: "#00f0ff", body: "#ff3366", cuore: "#ff3366", english: "#f97316" };
+                return <div key={i} className="pl-2 mb-1.5" style={{ borderLeft: `2px solid ${lc[e.c] || "rgba(200,210,230,0.08)"}` }}><div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>{e.t}</div><div className="text-[10px]" style={{ color: "rgba(200,210,230,0.35)" }}>{e.x}</div></div>;
+              })}
+            </>)}
           </div>
         )}
       </div>
 
-      {/* ═══ BOTTOM NAV ═══ */}
+      {/* ═══ BOTTOM NAV — 4 TABS ═══ */}
       <div className="fixed bottom-0 left-0 right-0 z-50" style={{ background: "rgba(2,8,16,0.95)", borderTop: "1px solid rgba(0,240,255,0.06)", backdropFilter: "blur(20px)" }}>
         <div className="flex max-w-lg mx-auto">
           {tabs.map(t => (
