@@ -105,15 +105,15 @@ const DEFAULT_STATE = {
   },
   universidata: { taskAttivi: [], scadenze: [], noteStrategiche: [], prioritaSettimana: "" },
   quests: [
-    { id: 1, n: "Digiuno 16h", d: "Completa IF", xp: 15, t: "corpo", done: false, i: "🔥" },
-    { id: 2, n: "Movimento 30min", d: "Camminata o corsa", xp: 20, t: "corpo", done: false, i: "🏃" },
-    { id: 3, n: "Journaling", d: "10 righe sul tuo stato", xp: 10, t: "mente", done: false, i: "📝" },
-    { id: 4, n: "Notte Disciplinata", d: "A letto entro l'1:00", xp: 15, t: "disciplina", done: false, i: "🌙" },
-    { id: 5, n: "THC Reward", d: "Solo dopo 3 quest", xp: 20, t: "disciplina", done: false, i: "🎯" },
-    { id: 6, n: "Shaolin Morning", d: "10 min meditazione", xp: 15, t: "spirito", done: false, i: "🧘" },
-    { id: 7, n: "Frontman 5min", d: "Public speaking", xp: 15, t: "carisma", done: false, i: "🎤" },
-    { id: 8, n: "Cristina Time", d: "30 min dedicati a lei", xp: 20, t: "cuore", done: false, i: "❤️" },
-    { id: 9, n: "English Challenge", d: "Daily English exercise", xp: 15, t: "mente", done: false, i: "🇬🇧" },
+    { id: 1, n: "Digiuno 16h", d: "Completa IF", xp: 15, t: "corpo", status: "available", i: "🔥" },
+    { id: 2, n: "Movimento 30min", d: "Camminata o corsa", xp: 20, t: "corpo", status: "available", i: "🏃" },
+    { id: 3, n: "Journaling", d: "10 righe sul tuo stato", xp: 10, t: "mente", status: "available", i: "📝" },
+    { id: 4, n: "Notte Disciplinata", d: "A letto entro l'1:00", xp: 15, t: "disciplina", status: "available", i: "🌙" },
+    { id: 5, n: "THC Reward", d: "Solo dopo 3 quest", xp: 20, t: "disciplina", status: "available", i: "🎯" },
+    { id: 6, n: "Shaolin Morning", d: "10 min meditazione", xp: 15, t: "spirito", status: "available", i: "🧘" },
+    { id: 7, n: "Frontman 5min", d: "Public speaking", xp: 15, t: "carisma", status: "available", i: "🎤" },
+    { id: 8, n: "Cristina Time", d: "30 min dedicati a lei", xp: 20, t: "cuore", status: "available", i: "❤️" },
+    { id: 9, n: "English Challenge", d: "Daily English exercise", xp: 15, t: "mente", status: "available", i: "🇬🇧" },
   ],
   questHistory: [],
   scheduler: [
@@ -303,6 +303,7 @@ function App() {
           ...parsed,
           cristina: { ...DEFAULT_STATE.cristina, ...parsed.cristina, ciclo: { ...DEFAULT_STATE.cristina.ciclo, ...(parsed.cristina?.ciclo || {}) } },
           eko: { ...DEFAULT_STATE.eko, ...parsed.eko, personalita: { ironia: parsed.eko?.personalita?.ironia ?? 7, tough_love: parsed.eko?.personalita?.tough_love ?? 6, creativita: parsed.eko?.personalita?.creativita ?? 8 } },
+          quests: (parsed.quests || DEFAULT_STATE.quests).map(q => ({ ...q, status: q.status || (q.done ? "completed" : "available") })),
           questHistory: parsed.questHistory || [],
         };
       }
@@ -314,7 +315,7 @@ function App() {
   const [tab, setTab] = useState("home");
   const [lifeSub, setLifeSub] = useState("cristina");
   const [ekoSub, setEkoSub] = useState("profile");
-  const [questSub, setQuestSub] = useState("active");
+  const [questSub, setQuestSub] = useState("available");
   const [wIn, setWIn] = useState("");
   const [xIn, setXIn] = useState("");
   const [curQ, setCurQ] = useState("");
@@ -346,17 +347,30 @@ function App() {
   };
 
   // ═══ QUEST ACTIONS ═══
-  const doQuest = (id) => {
-    const quest = quests.find(q => q.id === id); if (!quest || quest.done) return;
+  // Accept: available → accepted (enters Quest Log)
+  const acceptQuest = (id) => {
+    setS(p => ({ ...p, quests: p.quests.map(q => q.id === id ? { ...q, status: "accepted", acceptedAt: new Date().toISOString() } : q) }));
+    const quest = quests.find(q => q.id === id);
+    addLog(`Quest "${quest?.n}" accepted`, "quest"); flash("Quest accepted!");
+  };
+
+  // Complete: accepted → completed (awards XP + stats)
+  const completeQuest = (id) => {
+    const quest = quests.find(q => q.id === id); if (!quest || quest.status !== "accepted") return;
     const map = { corpo: "corpo", mente: "mente", disciplina: "disciplina", spirito: "spirito", carisma: "carisma", salute: "resistenza", cuore: "empatia" };
     const key = map[quest.t];
     setS(p => {
       const ns = { ...p.fauno.stats }; if (key && ns[key] !== undefined) ns[key] = Math.min(100, ns[key] + (quest.t === "disciplina" ? 5 : 3));
-      return { ...p, quests: p.quests.map(q => q.id === id ? { ...q, done: true, completedAt: new Date().toISOString() } : q), fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } } };
+      return {
+        ...p,
+        quests: p.quests.map(q => q.id === id ? { ...q, status: "completed", completedAt: new Date().toISOString() } : q),
+        fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } },
+      };
     });
     addLog(`Quest "${quest.n}" completed (+${quest.xp}xp)`, "quest"); flash(`+${quest.xp} XP!`);
   };
 
+  // Archive: completed → move to history
   const archiveQuest = (id) => {
     setS(p => {
       const quest = p.quests.find(q => q.id === id);
@@ -370,17 +384,25 @@ function App() {
     flash("Archived");
   };
 
+  // Delete from history permanently
   const deleteFromHistory = (id) => {
     setS(p => ({ ...p, questHistory: p.questHistory.filter(q => q.id !== id) }));
     flash("Deleted");
   };
 
+  // Reset: all quests back to available
   const resetDailyQuests = () => {
     setS(p => ({
       ...p,
-      quests: p.quests.map(q => ({ ...q, done: false, completedAt: undefined })),
+      quests: p.quests.map(q => ({ ...q, status: "available", acceptedAt: undefined, completedAt: undefined })),
     }));
     addLog("Daily quests reset", "system"); flash("New day, new quests!");
+  };
+
+  // Drop: accepted → back to available
+  const dropQuest = (id) => {
+    setS(p => ({ ...p, quests: p.quests.map(q => q.id === id ? { ...q, status: "available", acceptedAt: undefined } : q) }));
+    flash("Quest dropped");
   };
 
   // ═══ WEIGHT ═══
@@ -486,9 +508,12 @@ function App() {
   const oggi = new Date();
   const deadline = new Date(fauno.deadline);
   const days = Math.max(0, Math.ceil((deadline - oggi) / 86400000));
-  const qDone = quests.filter(q => q.done).length;
+  const qAccepted = quests.filter(q => q.status === "accepted");
+  const qCompleted = quests.filter(q => q.status === "completed");
+  const qAvailable = quests.filter(q => q.status === "available");
+  const qDone = qCompleted.length;
   const qTotal = quests.length;
-  const qXP = quests.filter(q => q.done).reduce((s, q) => s + q.xp, 0);
+  const qXP = qCompleted.reduce((s, q) => s + q.xp, 0);
   const wProg = Math.max(0, ((fauno.peso.partenza - fauno.peso.attuale) / (fauno.peso.partenza - fauno.peso.obiettivo)) * 100);
   const kgLeft = (fauno.peso.attuale - fauno.peso.obiettivo).toFixed(1);
   const avgStat = Math.round(Object.values(fauno.stats).reduce((a, b) => a + b, 0) / Object.keys(fauno.stats).length);
@@ -531,10 +556,10 @@ function App() {
   ];
 
   const questTabList = [
-    { id: "active", l: "Active", c: "#f9ca24" },
-    { id: "completed", l: "Done", c: "#22c55e" },
+    { id: "available", l: `Available (${qAvailable.length})`, c: "#f9ca24" },
+    { id: "log", l: `Log (${qAccepted.length})`, c: "#f97316" },
     { id: "board", l: "Board", c: "#00f0ff" },
-    { id: "history", l: "History", c: "rgba(200,210,230,0.3)" },
+    { id: "archive", l: "Archive", c: "rgba(200,210,230,0.3)" },
   ];
 
   const cyclePred = getCyclePrediction();
@@ -586,6 +611,28 @@ function App() {
             </div>
           </div>
 
+          {/* Quest Log on Home — shows accepted quests */}
+          {qAccepted.length > 0 && (
+            <div className="px-4 max-w-lg mx-auto animate-fade-delay2">
+              <Card accent="rgba(249,115,22,0.3)">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-[10px] font-mono tracking-wider" style={{ color: "#f97316" }}>📋 QUEST LOG</div>
+                  <div className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,115,22,0.08)", color: "#f97316" }}>{qAccepted.length} active</div>
+                </div>
+                {qAccepted.map(q => (
+                  <div key={q.id} className="flex items-center gap-2 rounded-lg p-2 mb-1.5" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
+                    <div className="text-sm">{q.i}</div>
+                    <div className="flex-1">
+                      <div className="text-[11px]" style={{ color: "rgba(200,210,230,0.6)" }}>{q.n}</div>
+                      <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.15)" }}>{q.t} · +{q.xp}xp</div>
+                    </div>
+                    <Btn onClick={() => completeQuest(q.id)} color="#22c55e" small>✓</Btn>
+                  </div>
+                ))}
+              </Card>
+            </div>
+          )}
+
           {/* Quick Weight Input */}
           <div className="px-4 max-w-lg mx-auto animate-fade-delay3">
             <Card accent="rgba(255,51,102,0.25)">
@@ -621,14 +668,14 @@ function App() {
           <div className="px-4 py-4 max-w-lg mx-auto">
             <SubTabs tabs={questTabList} active={questSub} onChange={setQuestSub} />
 
-            {/* ACTIVE */}
-            {questSub === "active" && (<>
+            {/* AVAILABLE — tap to accept */}
+            {questSub === "available" && (<>
               <div className="flex justify-between items-center mb-3">
-                <div className="text-[10px] font-mono tracking-widest" style={{ color: "#f9ca24" }}>⚔ DAILY QUESTS · {qDone}/{qTotal}</div>
-                <Btn onClick={resetDailyQuests} color="rgba(200,210,230,0.3)" small>Reset</Btn>
+                <div className="text-[10px] font-mono tracking-widest" style={{ color: "#f9ca24" }}>⚔ AVAILABLE QUESTS</div>
+                <Btn onClick={resetDailyQuests} color="rgba(200,210,230,0.3)" small>Reset All</Btn>
               </div>
-              {quests.filter(q => !q.done).map(q => (
-                <div key={q.id} onClick={() => doQuest(q.id)}
+              {qAvailable.map(q => (
+                <div key={q.id} onClick={() => acceptQuest(q.id)}
                   className="rounded-xl p-3 mb-2 border cursor-pointer transition-all active:scale-[0.98]"
                   style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
                   <div className="flex justify-between items-center">
@@ -639,32 +686,58 @@ function App() {
                         <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
                       </div>
                     </div>
-                    <span className="text-[11px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
+                      <span className="text-[9px] font-mono px-2 py-1 rounded" style={{ background: "rgba(249,202,36,0.08)", color: "#f9ca24", border: "1px solid rgba(249,202,36,0.2)" }}>ACCEPT</span>
+                    </div>
                   </div>
                 </div>
               ))}
-              {quests.filter(q => !q.done).length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>All done! You're a beast today.</div>}
+              {qAvailable.length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>All quests accepted or completed!</div>}
             </>)}
 
-            {/* COMPLETED (today) */}
-            {questSub === "completed" && (<>
-              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>✅ COMPLETED TODAY</div>
-              {quests.filter(q => q.done).length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>Nothing completed yet. Go do something!</div>}
-              {quests.filter(q => q.done).map(q => (
+            {/* QUEST LOG — accepted, waiting to be completed */}
+            {questSub === "log" && (<>
+              <div className="text-[10px] font-mono tracking-widest mb-1" style={{ color: "#f97316" }}>📋 QUEST LOG</div>
+              <div className="text-[9px] mb-3" style={{ color: "rgba(200,210,230,0.15)" }}>Accepted quests. Tap ✓ when done.</div>
+              {qAccepted.length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>No active quests. Accept some from Available!</div>}
+              {qAccepted.map(q => (
                 <div key={q.id} className="rounded-xl p-3 mb-2 border"
-                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(34,197,94,0.1)", borderLeftWidth: 3, borderLeftColor: "rgba(34,197,94,0.3)" }}>
+                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(249,115,22,0.1)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-base">✅</span>
+                      <span className="text-base">{q.i}</span>
                       <div>
-                        <div className="text-[12px] font-semibold" style={{ color: "rgba(200,210,230,0.5)" }}>{q.n}</div>
-                        <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.15)" }}>+{q.xp} XP</div>
+                        <div className="text-[12px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</div>
+                        <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.15)" }}>{q.d} · +{q.xp}xp</div>
                       </div>
                     </div>
-                    <Btn onClick={() => archiveQuest(q.id)} color="rgba(200,210,230,0.3)" small>Archive</Btn>
+                    <div className="flex gap-1">
+                      <Btn onClick={() => completeQuest(q.id)} color="#22c55e" small>✓ Done</Btn>
+                      <Btn onClick={() => dropQuest(q.id)} color="rgba(200,210,230,0.2)" small>✗</Btn>
+                    </div>
                   </div>
                 </div>
               ))}
+              {/* Completed today — ready to archive */}
+              {qCompleted.length > 0 && <>
+                <div className="text-[9px] font-mono tracking-widest mt-5 mb-2 pt-3" style={{ color: "rgba(34,197,94,0.5)", borderTop: "1px solid rgba(0,240,255,0.04)" }}>COMPLETED TODAY</div>
+                {qCompleted.map(q => (
+                  <div key={q.id} className="rounded-xl p-3 mb-2 border"
+                    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(34,197,94,0.08)", borderLeftWidth: 3, borderLeftColor: "rgba(34,197,94,0.2)" }}>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-base">✅</span>
+                        <div>
+                          <div className="text-[12px]" style={{ color: "rgba(200,210,230,0.4)" }}>{q.n}</div>
+                          <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>+{q.xp}xp · {q.completedAt ? new Date(q.completedAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) : ""}</div>
+                        </div>
+                      </div>
+                      <Btn onClick={() => archiveQuest(q.id)} color="rgba(200,210,230,0.25)" small>Archive</Btn>
+                    </div>
+                  </div>
+                ))}
+              </>}
             </>)}
 
             {/* EKO BOARD */}
@@ -695,22 +768,29 @@ function App() {
               </>}
             </>)}
 
-            {/* HISTORY */}
-            {questSub === "history" && (<>
+            {/* ARCHIVE — sorted by completedAt (newest first) */}
+            {questSub === "archive" && (<>
               <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "rgba(200,210,230,0.3)" }}>📜 QUEST ARCHIVE</div>
-              {questHistory.length === 0 && <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>No archived quests yet.</div>}
-              {questHistory.slice().reverse().map(q => (
-                <div key={q.id + (q.archivedAt || "")} className="rounded-xl p-3 mb-2 border"
-                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.04)" }}>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="text-[11px]" style={{ color: "rgba(200,210,230,0.4)" }}>{q.i} {q.n}</div>
-                      <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>{q.archivedAt ? new Date(q.archivedAt).toLocaleDateString("it-IT") : ""} · +{q.xp}xp</div>
+              {(() => {
+                const archived = questHistory.slice().sort((a, b) => new Date(b.completedAt || b.archivedAt || 0) - new Date(a.completedAt || a.archivedAt || 0));
+                if (archived.length === 0) return <div className="text-center py-8 text-[11px]" style={{ color: "rgba(200,210,230,0.2)" }}>No archived quests yet. Complete quests to see them here.</div>;
+                return archived.map(q => (
+                  <div key={q.id + (q.archivedAt || "")} className="rounded-xl p-3 mb-2 border"
+                    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.04)" }}>
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <div className="text-[11px]" style={{ color: "rgba(200,210,230,0.5)" }}>{q.i} {q.n}</div>
+                        <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.15)" }}>
+                          {q.completedAt ? `✓ ${new Date(q.completedAt).toLocaleDateString("it-IT")} ${new Date(q.completedAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}` : ""}
+                          {q.archivedAt ? ` · archived ${new Date(q.archivedAt).toLocaleDateString("it-IT")}` : ""}
+                          {` · +${q.xp}xp · ${q.t}`}
+                        </div>
+                      </div>
+                      <Btn onClick={() => deleteFromHistory(q.id)} color="#ff3366" small>✗</Btn>
                     </div>
-                    <Btn onClick={() => deleteFromHistory(q.id)} color="#ff3366" small>✗</Btn>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </>)}
           </div>
         )}
