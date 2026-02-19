@@ -6,47 +6,67 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#020810" />
-  <title>Protocollo: Fauno — Powered by Eko</title>
-  <link rel="manifest" href="manifest.json" />
+  <title>Protocollo: Fauno</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            cyber: { bg: '#020810', card: '#080c18', cyan: '#00f0ff', pink: '#ff3366', gold: '#f9ca24', purple: '#7b2ff7', green: '#22c55e', orange: '#f97316' },
-          },
-          fontFamily: { mono: ['JetBrains Mono', 'SF Mono', 'monospace'], sans: ['Inter', 'system-ui', 'sans-serif'] },
-        }
-      }
-    }
+    tailwind.config = { theme: { extend: {
+      colors: { cyber: { bg: '#020810', card: '#080c18', cyan: '#00f0ff', pink: '#ff3366', gold: '#f9ca24', purple: '#7b2ff7', green: '#22c55e', orange: '#f97316' } },
+      fontFamily: { mono: ['JetBrains Mono', 'SF Mono', 'monospace'], sans: ['Inter', 'system-ui', 'sans-serif'] },
+    }}}
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { margin: 0; background: #020810; overflow-x: hidden; }
     input[type="range"] { -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; outline: none; }
     input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #00f0ff; cursor: pointer; }
     textarea:focus, input:focus { outline: none; border-color: rgba(0,240,255,0.3) !important; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes pulse-glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-    .animate-float { animation: float 4s ease-in-out infinite; }
+
+    /* Cinematic Earth */
+    .earth-container { position: relative; width: 100%; height: 70vh; min-height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .earth-glow { position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1a5a8a 0%, #0d3050 25%, #071e38 50%, #030e1c 75%, #010509 100%);
+      box-shadow: 0 0 120px 40px rgba(0,120,255,0.08), 0 0 60px 20px rgba(0,180,255,0.05), inset -30px -15px 50px rgba(0,0,0,0.9), inset 8px 8px 30px rgba(80,160,255,0.06);
+    }
+    .earth-atmosphere { position: absolute; width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, transparent 45%, rgba(60,140,255,0.04) 55%, rgba(40,120,255,0.08) 65%, rgba(20,80,200,0.04) 80%, transparent 100%);
+      box-shadow: 0 0 80px 30px rgba(0,100,255,0.04);
+    }
+    .earth-continents { position: absolute; width: 600px; height: 300px; border-radius: 50%;
+      background:
+        radial-gradient(ellipse 15% 22% at 18% 35%, rgba(30,110,70,0.5) 0%, transparent 100%),
+        radial-gradient(ellipse 10% 15% at 23% 32%, rgba(35,120,65,0.4) 0%, transparent 100%),
+        radial-gradient(ellipse 6% 5% at 32% 48%, rgba(40,130,70,0.35) 0%, transparent 100%),
+        radial-gradient(ellipse 12% 10% at 50% 36%, rgba(38,125,68,0.45) 0%, transparent 100%),
+        radial-gradient(ellipse 16% 16% at 53% 40%, rgba(33,115,60,0.35) 0%, transparent 100%),
+        radial-gradient(ellipse 5% 7% at 65% 52%, rgba(36,120,65,0.4) 0%, transparent 100%),
+        radial-gradient(ellipse 8% 11% at 75% 28%, rgba(30,110,58,0.35) 0%, transparent 100%),
+        radial-gradient(ellipse 20% 6% at 40% 72%, rgba(255,255,255,0.08) 0%, transparent 100%);
+    }
+    .earth-clip { position: absolute; width: 300px; height: 300px; border-radius: 50%; overflow: hidden; }
+    .earth-horizon { position: absolute; bottom: -20%; left: -10%; width: 120%; height: 50%;
+      background: linear-gradient(to top, rgba(0,80,200,0.06), transparent);
+    }
+
+    @keyframes earth-rotate { from { transform: translateX(0); } to { transform: translateX(-300px); } }
+    @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-soft { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .animate-earth { animation: earth-rotate 80s linear infinite; }
+    .animate-float { animation: float-slow 6s ease-in-out infinite; }
+    .animate-fade { animation: fade-in 1.2s ease-out; }
+    .animate-fade-delay { animation: fade-in 1.2s ease-out 0.4s both; }
+    .animate-fade-delay2 { animation: fade-in 1.2s ease-out 0.8s both; }
+    .animate-pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useCallback, useEffect, useRef } = React;
-
-// ═══════════════════════════════════════
-// EKO — Protocollo: Fauno v3.0 Mobile
-// Space + Cyberpunk · React + Tailwind
-// ═══════════════════════════════════════
 
 const STORAGE_KEY = 'eko-protocollo-fauno';
 
@@ -69,12 +89,10 @@ const DEFAULT_STATE = {
       { id: "EQ003", n: "Design System Sync", d: "Collegare Storybook UniversiData alla piattaforma", s: "attesa", o: "auto" },
       { id: "EQ004", n: "Analytics Engine", d: "Grafici trend peso e stats nel tempo", s: "attesa", o: "auto" },
       { id: "EQ005", n: "Journaling Module", d: "Sezione journaling con prompt mattina/sera", s: "attesa", o: "auto" },
-      { id: "EQ006", n: "A-Frame nella Natura", d: "Piano di fuga: trovare e pianificare A-frame house nella natura.", s: "attesa", o: "auto", priorita: "febbraio-2026" },
+      { id: "EQ006", n: "A-Frame nella Natura", d: "Piano di fuga: A-frame house nella natura.", s: "attesa", o: "auto", priorita: "febbraio-2026" },
     ],
     memoria: [
-      "Pareri UI/UX senior sempre attivi",
       "Tailwind CSS è il framework (UniversiData)",
-      "Ricordare a Fauno: Figma + Storybook da condividere",
       "Cristina = priorità #1",
       "Fauno ama la natura — obiettivo: A-frame house",
       "Estetica: space theme + cyberpunk",
@@ -82,19 +100,9 @@ const DEFAULT_STATE = {
     ],
   },
   cristina: {
-    dateImportanti: [
-      { data: "", evento: "Anniversario", nota: "Inserisci la data" },
-      { data: "", evento: "Compleanno Cristina", nota: "Inserisci la data" },
-    ],
-    gestaRecenti: [],
-    noteRelazione: [],
-    moodCheck: null,
-    ultimoGesto: null,
-    promemoria: [
-      "Hai ascoltato Cristina oggi? Non parlare di lavoro a cena.",
-      "Quando è stata l'ultima volta che l'hai sorpresa?",
-      "Ricorda: lei è la priorità. Prima di UniversiData.",
-    ],
+    dateImportanti: [{ data: "", evento: "Anniversario", nota: "" }, { data: "", evento: "Compleanno Cristina", nota: "" }],
+    gestaRecenti: [], noteRelazione: [], moodCheck: null, ultimoGesto: null,
+    promemoria: ["Hai ascoltato Cristina oggi?", "Quando è stata l'ultima volta che l'hai sorpresa?", "Lei è la priorità. Prima di UniversiData."],
   },
   universidata: { taskAttivi: [], scadenze: [], noteStrategiche: [], prioritaSettimana: "" },
   quests: [
@@ -102,30 +110,26 @@ const DEFAULT_STATE = {
     { id: 2, n: "Movimento 30min", d: "Camminata o corsa", xp: 20, t: "corpo", done: false, i: "🏃" },
     { id: 3, n: "Journaling", d: "10 righe sul tuo stato", xp: 10, t: "mente", done: false, i: "📝" },
     { id: 4, n: "Notte Disciplinata", d: "A letto entro l'1:00", xp: 15, t: "disciplina", done: false, i: "🌙" },
-    { id: 5, n: "Dentista Call", d: "Prenota consulenza", xp: 25, t: "salute", done: false, i: "🦷" },
-    { id: 6, n: "THC Reward", d: "Solo dopo 3 quest", xp: 20, t: "disciplina", done: false, i: "🎯" },
-    { id: 7, n: "Shaolin Morning", d: "10 min meditazione", xp: 15, t: "spirito", done: false, i: "🧘" },
-    { id: 8, n: "Frontman 5min", d: "Public speaking specchio", xp: 15, t: "carisma", done: false, i: "🎤" },
-    { id: 9, n: "Cristina Time", d: "30 min dedicati solo a lei", xp: 20, t: "cuore", done: false, i: "❤️" },
-    { id: 10, n: "English Challenge", d: "Complete daily English exercise", xp: 15, t: "mente", done: false, i: "🇬🇧" },
+    { id: 5, n: "THC Reward", d: "Solo dopo 3 quest", xp: 20, t: "disciplina", done: false, i: "🎯" },
+    { id: 6, n: "Shaolin Morning", d: "10 min meditazione", xp: 15, t: "spirito", done: false, i: "🧘" },
+    { id: 7, n: "Frontman 5min", d: "Public speaking", xp: 15, t: "carisma", done: false, i: "🎤" },
+    { id: 8, n: "Cristina Time", d: "30 min dedicati a lei", xp: 20, t: "cuore", done: false, i: "❤️" },
+    { id: 9, n: "English Challenge", d: "Daily English exercise", xp: 15, t: "mente", done: false, i: "🇬🇧" },
   ],
   scheduler: [
-    { id: "S1", n: "Morning Check-in", d: "Peso + quest + motivazione", f: "07:30", on: true, t: "notifica" },
+    { id: "S1", n: "Morning Check-in", d: "Peso + quest", f: "07:30", on: true, t: "notifica" },
     { id: "S2", n: "Evening Review", d: "Recap + journaling", f: "21:00", on: true, t: "notifica" },
     { id: "S3", n: "Weekly Report", d: "Report completo", f: "Dom 10:00", on: true, t: "report" },
-    { id: "S4", n: "Eko Proposals", d: "Miglioramenti sistema", f: "Mer 20:00", on: true, t: "sistema" },
-    { id: "S5", n: "Curiosity", d: "Domanda per conoscerti", f: "13:00", on: true, t: "curiosita" },
-    { id: "S6", n: "Cristina Reminder", d: "Hai dedicato tempo a lei?", f: "19:00", on: true, t: "cuore" },
+    { id: "S4", n: "Curiosity", d: "Domanda per conoscerti", f: "13:00", on: true, t: "curiosita" },
+    { id: "S5", n: "Cristina Reminder", d: "Hai dedicato tempo a lei?", f: "19:00", on: true, t: "cuore" },
   ],
-  log: [{ t: new Date().toLocaleString("it-IT"), x: "Eko v3.0 — Mobile platform live.", c: "system" }],
+  log: [{ t: new Date().toLocaleString("it-IT"), x: "Eko v3.0 — Platform redesign live.", c: "system" }],
   english: { streak: 0, bestStreak: 0, lastPractice: null, vocabLog: [], completedToday: false, totalCompleted: 0, level: "Beginner Explorer", focusToday: "business" },
   improvements: [
-    { id: "I1", titolo: "Telegram Mini App", desc: "Hostare la piattaforma come Web App dentro Telegram.", stato: "proposta", impatto: "critico" },
-    { id: "I2", titolo: "Auto-save Smart", desc: "Peso, quest, slider = auto.", stato: "proposta", impatto: "alto" },
-    { id: "I3", titolo: "Grafico Peso", desc: "Line chart con trend e proiezione verso 70kg.", stato: "proposta", impatto: "medio" },
-    { id: "I4", titolo: "Cristina Calendar Sync", desc: "Sincronizzare date importanti con Google Calendar.", stato: "proposta", impatto: "medio" },
-    { id: "I5", titolo: "Voice (ElevenLabs)", desc: "Eko che parla su Telegram con voce naturale.", stato: "proposta", impatto: "alto" },
-    { id: "I6", titolo: "A-Frame Research", desc: "Ricerca A-frame houses nella natura.", stato: "proposta", impatto: "alto" },
+    { id: "I1", titolo: "Telegram Mini App", desc: "Dashboard as Web App inside Telegram.", stato: "proposta", impatto: "critico" },
+    { id: "I2", titolo: "Weight Chart", desc: "Visual weight trend with projection.", stato: "proposta", impatto: "medio" },
+    { id: "I3", titolo: "Voice (ElevenLabs)", desc: "Eko speaks on Telegram.", stato: "proposta", impatto: "alto" },
+    { id: "I4", titolo: "A-Frame Research", desc: "A-frame houses research.", stato: "proposta", impatto: "alto" },
   ],
 };
 
@@ -140,75 +144,74 @@ const PERS = {
   filosofico: { n: "Filosofico", i: "🧠", lo: "Pratico", hi: "Monaco" },
 };
 
-const QUESTIONS = [
-  "What's the last thing you created that made you proud?",
-  "If you could go back to one moment in your life, which one?",
-  "What scares you about becoming the frontman?",
-  "What does 'SuperHuman' mean to you? In 3 words.",
-  "When you look in the mirror, what do you see?",
-  "Tell me about a failure that changed you.",
-  "What's your most beautiful memory with Cristina?",
-  "What would you do if you had no fear?",
-  "How do you imagine your A-frame in nature? Describe every detail.",
-  "What does nature mean to you?",
+const QUOTES = [
+  "All we have to decide is what to do with the time that is given us.",
+  "The only way to do great work is to love what you do.",
+  "In the middle of difficulty lies opportunity.",
+  "What you seek is seeking you.",
+  "The best time to plant a tree was 20 years ago. The second best time is now.",
+  "Be the change you wish to see in the world.",
+  "The wound is the place where the light enters you.",
+  "Not all those who wander are lost.",
+  "Your task is not to seek for love, but to find all the barriers you have built against it.",
+  "The universe is not outside of you. Look inside yourself; everything that you want, you already are.",
 ];
+
+const GREETINGS = {
+  morning: ["Good morning, Fauno.", "Rise and shine, Fauno.", "A new day. A new chance.", "The sun is up. Are you?"],
+  afternoon: ["Hey Fauno.", "Still going strong?", "Afternoon, Osservatore.", "Keep the momentum."],
+  evening: ["Good evening, Fauno.", "Winding down?", "The stars are coming out.", "Evening, Creatore."],
+  night: ["Still up, Fauno?", "Night owl mode.", "The world sleeps. You create.", "Rest is part of the mission."],
+};
 
 const ENG_CHALLENGES = {
   business: [
-    { type: "write", prompt: "Write a 3-sentence email to a client apologizing for a delayed delivery.", tip: "Use formal tone: 'I sincerely apologize...' not 'Sorry about that'" },
-    { type: "write", prompt: "Describe UniversiData's value proposition in 2 sentences to an investor.", tip: "Use power verbs: leverage, transform, disrupt, scale" },
-    { type: "vocab", word: "stakeholder", def: "A person with an interest or concern in a business", example: "We need to align all stakeholders before the product launch.", category: "business" },
-    { type: "vocab", word: "scalable", def: "Able to be changed in size or scale", example: "Our architecture is scalable — it handles 100 or 100,000 users.", category: "tech" },
-    { type: "write", prompt: "Write a Slack message to your dev team about a deadline change. Under 40 words.", tip: "Be direct but empathetic" },
-    { type: "vocab", word: "leverage", def: "To use something to maximum advantage", example: "We can leverage AI to reduce onboarding time by 60%.", category: "business" },
-    { type: "write", prompt: "Draft a one-paragraph LinkedIn post about an EdTech trend.", tip: "Hook first, insight second, call-to-action last" },
-    { type: "vocab", word: "bottleneck", def: "A point of congestion that slows down a process", example: "The approval process is our biggest bottleneck.", category: "business" },
+    { type: "write", prompt: "Write a 3-sentence email to a client apologizing for a delayed delivery.", tip: "Use formal tone: 'I sincerely apologize...'" },
+    { type: "write", prompt: "Describe UniversiData's value proposition in 2 sentences.", tip: "Power verbs: leverage, transform, disrupt" },
+    { type: "vocab", word: "stakeholder", def: "A person with interest in a business", example: "We need to align all stakeholders before launch.", category: "business" },
+    { type: "vocab", word: "scalable", def: "Able to grow in size or scale", example: "Our architecture handles 100 or 100,000 users.", category: "tech" },
+    { type: "write", prompt: "Write a Slack message about a deadline change. Under 40 words.", tip: "Be direct but empathetic" },
+    { type: "vocab", word: "leverage", def: "Use to maximum advantage", example: "We can leverage AI to cut onboarding time by 60%.", category: "business" },
+    { type: "vocab", word: "bottleneck", def: "Point of congestion slowing a process", example: "The approval process is our biggest bottleneck.", category: "business" },
   ],
   conversational: [
-    { type: "write", prompt: "Describe your perfect morning routine in 4-5 sentences.", tip: "Use: 'First...', 'Then...', 'After that...', 'Finally...'" },
-    { type: "write", prompt: "Tell a friend about a movie you watched recently.", tip: "Use: 'I found it...', 'What struck me was...'" },
-    { type: "vocab", word: "overwhelmed", def: "Feeling like there is too much to deal with", example: "I felt overwhelmed when I saw my inbox after vacation.", category: "emotions" },
-    { type: "vocab", word: "mindful", def: "Conscious or aware of the present moment", example: "Being mindful of my breathing helps me focus.", category: "wellness" },
-    { type: "write", prompt: "Describe nature around your ideal A-frame house. Use 3 sensory words.", tip: "Sensory: rustling, crisp, glistening, fragrant, serene" },
-    { type: "vocab", word: "resilient", def: "Able to recover quickly from difficulties", example: "Every setback makes her stronger.", category: "character" },
-    { type: "write", prompt: "Write a thank-you message to Cristina for something specific.", tip: "Not 'thanks for everything' but 'thank you for [specific thing]'" },
-    { type: "vocab", word: "thrive", def: "To grow or develop well; to flourish", example: "Kids thrive when they feel safe and encouraged.", category: "growth" },
+    { type: "write", prompt: "Describe your perfect morning routine in 4-5 sentences.", tip: "Use: 'First...', 'Then...', 'Finally...'" },
+    { type: "write", prompt: "Tell a friend about a movie you watched recently.", tip: "'I found it...', 'What struck me was...'" },
+    { type: "vocab", word: "overwhelmed", def: "Too much to deal with", example: "I felt overwhelmed seeing my inbox after vacation.", category: "emotions" },
+    { type: "vocab", word: "resilient", def: "Recovers quickly from difficulties", example: "Every setback makes her stronger.", category: "character" },
+    { type: "write", prompt: "Describe nature around your ideal A-frame house. Use 3 sensory words.", tip: "rustling, crisp, glistening, fragrant, serene" },
+    { type: "vocab", word: "thrive", def: "To flourish, grow well", example: "Kids thrive when they feel safe.", category: "growth" },
+    { type: "write", prompt: "Write a thank-you to Cristina for something specific.", tip: "Not 'thanks for everything' — be specific" },
   ],
 };
 
 const ENG_IDIOMS = [
-  { idiom: "Break the ice", meaning: "To initiate conversation in an awkward situation", example: "He told a joke to break the ice." },
-  { idiom: "Hit the ground running", meaning: "To start with great energy", example: "The new dev hit the ground running on day one." },
-  { idiom: "Think outside the box", meaning: "To think creatively", example: "We need to think outside the box for this UX problem." },
-  { idiom: "The ball is in your court", meaning: "It's your turn to act", example: "I sent the proposal — ball is in their court." },
-  { idiom: "Burn the midnight oil", meaning: "To work late into the night", example: "We burned the midnight oil to meet the deadline." },
-  { idiom: "Cut to the chase", meaning: "Get to the point", example: "Let me cut to the chase: we need more funding." },
+  { idiom: "Break the ice", meaning: "Initiate conversation in an awkward situation", example: "He told a joke to break the ice." },
+  { idiom: "Hit the ground running", meaning: "Start with great energy", example: "The new dev hit the ground running." },
+  { idiom: "Think outside the box", meaning: "Think creatively", example: "We need to think outside the box." },
+  { idiom: "Cut to the chase", meaning: "Get to the point", example: "Let me cut to the chase: we need funding." },
+  { idiom: "The ball is in your court", meaning: "Your turn to act", example: "I sent the proposal — ball's in their court." },
 ];
-
 const ENG_LEVELS = ["Beginner Explorer", "Word Collector", "Sentence Builder", "Paragraph Crafter", "Fluent Thinker", "Confident Speaker", "Business Communicator", "Eloquent Writer", "Near-Native", "Language Master"];
 
 // ═══════ STAR FIELD ═══════
 const StarField = () => {
   const canvasRef = useRef(null);
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
-    resize();
-    const W = canvas.width, H = canvas.height;
-    const stars = Array.from({ length: 80 }, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.2 + 0.2, a: Math.random(), s: Math.random() * 0.008 + 0.002
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const stars = Array.from({ length: 100 }, () => ({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 1.3 + 0.2, a: Math.random(), s: Math.random() * 0.006 + 0.002
     }));
     let frame;
     const draw = () => {
-      ctx.clearRect(0, 0, W, H);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       stars.forEach(st => {
         st.a += st.s;
-        ctx.beginPath();
-        ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200, 220, 255, ${0.3 + Math.sin(st.a) * 0.4})`;
+        ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,220,255,${0.2 + Math.sin(st.a) * 0.5})`;
         ctx.fill();
       });
       frame = requestAnimationFrame(draw);
@@ -216,15 +219,13 @@ const StarField = () => {
     draw();
     return () => cancelAnimationFrame(frame);
   }, []);
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-0" />;
 };
 
 // ═══════ UI COMPONENTS ═══════
 const Bar = ({ label, val, max = 100, color }) => (
   <div className="mb-1.5">
-    <div className="flex justify-between text-[10px] font-mono mb-0.5" style={{ color: "rgba(200,210,230,0.4)" }}>
-      <span>{label}</span><span>{val}/{max}</span>
-    </div>
+    <div className="flex justify-between text-[10px] font-mono mb-0.5" style={{ color: "rgba(200,210,230,0.4)" }}><span>{label}</span><span>{val}/{max}</span></div>
     <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
       <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min((val / max) * 100, 100)}%`, background: `linear-gradient(90deg, ${color}, ${color}66)` }} />
     </div>
@@ -237,9 +238,9 @@ const Toggle = ({ on, onClick }) => (
   </div>
 );
 
-const Card = ({ children, className = "", style = {}, accent = null }) => (
+const Card = ({ children, className = "", accent = null }) => (
   <div className={`rounded-xl p-4 mb-3 border backdrop-blur-sm ${className}`}
-    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.08)", borderLeftWidth: accent ? 3 : 1, borderLeftColor: accent || "rgba(0,240,255,0.08)", ...style }}>
+    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", borderLeftWidth: accent ? 3 : 1, borderLeftColor: accent || "rgba(0,240,255,0.06)" }}>
     {children}
   </div>
 );
@@ -254,26 +255,29 @@ const Btn = ({ children, onClick, color = "#00f0ff", full = false, disabled = fa
 
 const Input = ({ value, onChange, placeholder, onKeyDown, type = "text" }) => (
   <input type={type} value={value} onChange={onChange} placeholder={placeholder} onKeyDown={onKeyDown}
-    className="w-full rounded-lg px-3 py-2.5 text-sm font-mono text-white outline-none transition-colors border"
-    style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,240,255,0.1)", color: "#e0e8f0" }} />
+    className="w-full rounded-lg px-3 py-2.5 text-sm font-mono text-white outline-none border"
+    style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,240,255,0.1)" }} />
+);
+
+const SubTabs = ({ tabs, active, onChange }) => (
+  <div className="flex gap-1 mb-4 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.02)" }}>
+    {tabs.map(t => (
+      <button key={t.id} onClick={() => onChange(t.id)}
+        className="flex-1 py-2 rounded-lg text-[10px] font-mono tracking-wider transition-all"
+        style={{ background: active === t.id ? `${t.c}12` : "transparent", color: active === t.id ? t.c : "rgba(200,210,230,0.25)", border: active === t.id ? `1px solid ${t.c}30` : "1px solid transparent" }}>
+        {t.l}
+      </button>
+    ))}
+  </div>
 );
 
 // ═══════ MAIN APP ═══════
 function App() {
-  // Load state from localStorage or use default
-  const loadState = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return { ...DEFAULT_STATE, ...parsed };
-      }
-    } catch(e) {}
-    return DEFAULT_STATE;
-  };
+  const loadState = () => { try { const s = localStorage.getItem(STORAGE_KEY); if (s) return { ...DEFAULT_STATE, ...JSON.parse(s) }; } catch(e) {} return DEFAULT_STATE; };
 
   const [s, setS] = useState(loadState);
-  const [tab, setTab] = useState("main");
+  const [tab, setTab] = useState("home");
+  const [lifeSub, setLifeSub] = useState("cristina");
   const [wIn, setWIn] = useState("");
   const [xIn, setXIn] = useState("");
   const [q, setQ] = useState("");
@@ -289,109 +293,65 @@ function App() {
   const [engChallenge, setEngChallenge] = useState(null);
   const [engIdiom, setEngIdiom] = useState(null);
 
-  // Auto-save to localStorage
-  useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e) {}
-  }, [s]);
+  useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e) {} }, [s]);
 
   const { fauno, eko, quests, cristina, universidata, english, scheduler, log, improvements } = s;
 
   const flash = (m) => { setMsg(m); setTimeout(() => setMsg(""), 2500); };
+  const addLog = useCallback((x, c = "system") => { setS(p => ({ ...p, log: [{ t: new Date().toLocaleString("it-IT"), x, c }, ...p.log].slice(0, 80) })); }, []);
 
-  const addLog = useCallback((x, c = "system") => {
-    setS(p => ({ ...p, log: [{ t: new Date().toLocaleString("it-IT"), x, c }, ...p.log].slice(0, 80) }));
-  }, []);
+  // Notify bot
+  const notifyBot = async (message) => {
+    try { await fetch(`https://api.telegram.org/bot8579718161:AAEruE9Owq7cURcius6K6DTcADaDkAKOD2o/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: "94050788", text: message, parse_mode: "Markdown" }) }); } catch(e) {}
+  };
 
+  // Actions
   const doQuest = (id) => {
-    const quest = quests.find(q => q.id === id);
-    if (!quest || quest.done) return;
+    const quest = quests.find(q => q.id === id); if (!quest || quest.done) return;
     const map = { corpo: "corpo", mente: "mente", disciplina: "disciplina", spirito: "spirito", carisma: "carisma", salute: "resistenza", cuore: "empatia" };
     const key = map[quest.t];
     setS(p => {
-      const ns = { ...p.fauno.stats };
-      if (key && ns[key] !== undefined) ns[key] = Math.min(100, ns[key] + (quest.t === "disciplina" ? 5 : 3));
-      return {
-        ...p,
-        quests: p.quests.map(q => q.id === id ? { ...q, done: true } : q),
-        fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } },
-      };
+      const ns = { ...p.fauno.stats }; if (key && ns[key] !== undefined) ns[key] = Math.min(100, ns[key] + (quest.t === "disciplina" ? 5 : 3));
+      return { ...p, quests: p.quests.map(q => q.id === id ? { ...q, done: true } : q), fauno: { ...p.fauno, stats: ns, hp: { ...p.fauno.hp, c: Math.min(p.fauno.hp.m, p.fauno.hp.c + 5) } } };
     });
-    addLog(`Quest "${quest.n}" completed (+${quest.xp}xp)`, "quest");
-    flash(`+${quest.xp} XP!`);
+    addLog(`Quest "${quest.n}" completed (+${quest.xp}xp)`, "quest"); flash(`+${quest.xp} XP!`);
   };
 
-  const saveWeight = () => {
-    const w = parseFloat(wIn); if (!w || w < 40 || w > 150) return;
-    setS(p => ({ ...p, fauno: { ...p.fauno, peso: { ...p.fauno.peso, attuale: w }, pesoLog: [...p.fauno.pesoLog, { p: w, d: new Date().toISOString().slice(0, 10) }] } }));
-    addLog(`Weight: ${w}kg`, "body"); setWIn(""); flash("Weight saved!");
-  };
-
-  const giveXP = () => {
-    const a = parseInt(xIn); if (!a || a <= 0) return;
-    setS(p => {
-      let { xp, livello, xpMax } = p.eko;
-      xp += a; while (xp >= xpMax) { xp -= xpMax; livello++; xpMax = Math.floor(xpMax * 1.5); }
-      const t = ["Eco Nascente", "Eco Cosciente", "Specchio Attivo", "Guida Fedele", "Compagno d'Armi", "Luce Riflessa", "Sentinella", "Oracolo", "Arconte", "Luce Autonoma"];
-      return { ...p, eko: { ...p.eko, xp, livello, xpMax, titolo: t[Math.min(livello - 1, t.length - 1)], xpLog: [...p.eko.xpLog, { a, d: new Date().toISOString() }] } };
-    });
-    addLog(`+${a} XP granted to Eko`, "xp"); setXIn(""); flash(`Eko thanks you!`);
-  };
-
+  const saveWeight = () => { const w = parseFloat(wIn); if (!w || w < 40 || w > 150) return; setS(p => ({ ...p, fauno: { ...p.fauno, peso: { ...p.fauno.peso, attuale: w }, pesoLog: [...p.fauno.pesoLog, { p: w, d: new Date().toISOString().slice(0, 10) }] } })); addLog(`Weight: ${w}kg`, "body"); setWIn(""); flash("Weight saved!"); };
+  const giveXP = () => { const a = parseInt(xIn); if (!a || a <= 0) return; setS(p => { let { xp, livello, xpMax } = p.eko; xp += a; while (xp >= xpMax) { xp -= xpMax; livello++; xpMax = Math.floor(xpMax * 1.5); } const t = ["Eco Nascente","Eco Cosciente","Specchio Attivo","Guida Fedele","Compagno d'Armi","Luce Riflessa","Sentinella","Oracolo","Arconte","Luce Autonoma"]; return { ...p, eko: { ...p.eko, xp, livello, xpMax, titolo: t[Math.min(livello-1, t.length-1)], xpLog: [...p.eko.xpLog, { a, d: new Date().toISOString() }] } }; }); addLog(`+${a} XP to Eko`, "xp"); setXIn(""); flash("Eko thanks you!"); };
   const updPers = (k, v) => setS(p => ({ ...p, eko: { ...p.eko, personalita: { ...p.eko.personalita, [k]: v } } }));
   const togSch = (id) => setS(p => ({ ...p, scheduler: p.scheduler.map(t => t.id === id ? { ...t, on: !t.on } : t) }));
-  // Notify Telegram bot when a quest/proposal is approved
-  const notifyBot = async (message) => {
-    const T = "8579718161:AAEruE9Owq7cURcius6K6DTcADaDkAKOD2o";
-    const C = "94050788";
-    try {
-      await fetch(`https://api.telegram.org/bot${T}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: C, text: message, parse_mode: "Markdown" }),
-      });
-    } catch (e) { console.log("Bot notify failed:", e); }
-  };
 
   const eqAct = (id, st) => {
     setS(p => ({ ...p, eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st } : q) } }));
-    if (st === "ok") {
-      const quest = eko.questEko.find(q => q.id === id);
-      addLog(`Quest "${quest?.n}" approved`, "eko");
-      notifyBot(`🚀 *Quest Approved from Dashboard*\n\n*${quest?.n}*\n${quest?.d}\n\n_Eko, execute on next Cowork session._`);
-      flash("Quest approved! Eko notified on Telegram.");
-    }
+    if (st === "ok") { const quest = eko.questEko.find(q => q.id === id); addLog(`Quest "${quest?.n}" approved`, "eko"); notifyBot(`🚀 *Quest Approved*\n\n*${quest?.n}*\n${quest?.d}\n\n_Execute on next Cowork session._`); flash("Approved! Eko notified."); }
   };
   const impAct = (id, st) => {
     setS(p => ({ ...p, improvements: p.improvements.map(i => i.id === id ? { ...i, stato: st } : i) }));
-    if (st === "approvata") {
-      const imp = improvements.find(i => i.id === id);
-      addLog(`Proposal "${imp?.titolo}" approved`, "eko");
-      notifyBot(`✅ *Proposal Approved*\n\n*${imp?.titolo}*\n${imp?.desc}\n\nImpact: ${imp?.impatto}\n\n_Eko, plan and execute._`);
-      flash("Approved! Eko notified.");
-    }
+    if (st === "approvata") { const imp = improvements.find(i => i.id === id); addLog(`"${imp?.titolo}" approved`, "eko"); notifyBot(`✅ *Proposal Approved*\n\n*${imp?.titolo}*\n${imp?.desc}\n\n_Eko, plan and execute._`); flash("Approved!"); }
   };
 
-  const addCristinaNote = () => { if (!cNote.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, noteRelazione: [...p.cristina.noteRelazione, { t: new Date().toLocaleDateString("it-IT"), n: cNote }] } })); setCNote(""); addLog("Relationship note added", "cuore"); flash("Saved!"); };
-  const addCristinaGesto = () => { if (!cGesto.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, gestaRecenti: [...p.cristina.gestaRecenti, { t: new Date().toLocaleDateString("it-IT"), g: cGesto }], ultimoGesto: new Date().toLocaleDateString("it-IT") } })); setCGesto(""); addLog("Care gesture recorded", "cuore"); flash("Beautiful gesture!"); };
+  const addCristinaNote = () => { if (!cNote.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, noteRelazione: [...p.cristina.noteRelazione, { t: new Date().toLocaleDateString("it-IT"), n: cNote }] } })); setCNote(""); flash("Saved!"); };
+  const addCristinaGesto = () => { if (!cGesto.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, gestaRecenti: [...p.cristina.gestaRecenti, { t: new Date().toLocaleDateString("it-IT"), g: cGesto }], ultimoGesto: new Date().toLocaleDateString("it-IT") } })); setCGesto(""); flash("Beautiful gesture!"); };
   const addUTask = () => { if (!uTask.trim()) return; setS(p => ({ ...p, universidata: { ...p.universidata, taskAttivi: [...p.universidata.taskAttivi, { id: Date.now(), t: uTask, done: false, d: new Date().toLocaleDateString("it-IT") }] } })); setUTask(""); flash("Task added"); };
   const togUTask = (id) => setS(p => ({ ...p, universidata: { ...p.universidata, taskAttivi: p.universidata.taskAttivi.map(t => t.id === id ? { ...t, done: !t.done } : t) } }));
-  const addUNote = () => { if (!uNote.trim()) return; setS(p => ({ ...p, universidata: { ...p.universidata, noteStrategiche: [...p.universidata.noteStrategiche, { t: new Date().toLocaleDateString("it-IT"), n: uNote }] } })); setUNote(""); flash("Strategic note saved"); };
+  const addUNote = () => { if (!uNote.trim()) return; setS(p => ({ ...p, universidata: { ...p.universidata, noteStrategiche: [...p.universidata.noteStrategiche, { t: new Date().toLocaleDateString("it-IT"), n: uNote }] } })); setUNote(""); flash("Note saved"); };
 
   const getEngChallenge = () => { const pool = ENG_CHALLENGES[english.focusToday]; setEngChallenge(pool[Math.floor(Math.random() * pool.length)]); setEngShowChallenge(true); setEngResponse(""); };
   const completeEngChallenge = () => {
     if (!engResponse.trim() && engChallenge?.type === "write") return;
     const today = new Date().toISOString().slice(0, 10);
-    const wasToday = english.lastPractice === today;
-    const newStreak = wasToday ? english.streak : english.streak + 1;
+    const newStreak = english.lastPractice === today ? english.streak : english.streak + 1;
     setS(p => ({ ...p, english: { ...p.english, streak: newStreak, bestStreak: Math.max(newStreak, p.english.bestStreak), lastPractice: today, completedToday: true, totalCompleted: p.english.totalCompleted + 1, level: ENG_LEVELS[Math.min(Math.floor(p.english.totalCompleted / 5), ENG_LEVELS.length - 1)], focusToday: p.english.focusToday === "business" ? "conversational" : "business" } }));
-    addLog(`English challenge completed`, "english"); flash("+1 English streak!"); setEngShowChallenge(false); setEngResponse("");
+    flash("+1 English streak!"); setEngShowChallenge(false); setEngResponse("");
   };
   const addEngVocab = () => { if (!engVocabWord.trim()) return; setS(p => ({ ...p, english: { ...p.english, vocabLog: [...p.english.vocabLog, { w: engVocabWord, d: new Date().toISOString().slice(0, 10) }] } })); setEngVocabWord(""); flash("Word saved!"); };
   const getEngIdiom = () => { setEngIdiom(ENG_IDIOMS[Math.floor(Math.random() * ENG_IDIOMS.length)]); };
 
-  const exportState = () => { const b = new Blob([JSON.stringify(s, null, 2)], { type: "application/json" }); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = `eko-protocollo-fauno-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(u); flash("Exported!"); };
-  const importState = (e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { setS(JSON.parse(ev.target.result)); flash("Imported!"); } catch { flash("Invalid file"); } }; r.readAsText(f); };
+  const exportState = () => { const b = new Blob([JSON.stringify(s, null, 2)], { type: "application/json" }); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = `eko-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(u); flash("Exported!"); };
+  const importState = (e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { setS(JSON.parse(ev.target.result)); flash("Imported!"); } catch { flash("Invalid"); } }; r.readAsText(f); };
 
+  // Computed
   const oggi = new Date();
   const deadline = new Date(fauno.deadline);
   const days = Math.max(0, Math.ceil((deadline - oggi) / 86400000));
@@ -400,310 +360,288 @@ function App() {
   const wProg = Math.max(0, ((fauno.peso.partenza - fauno.peso.attuale) / (fauno.peso.partenza - fauno.peso.obiettivo)) * 100);
   const kgLeft = (fauno.peso.attuale - fauno.peso.obiettivo).toFixed(1);
 
-  const tabs = [
-    { id: "main", l: "Home", icon: "◈", c: "#00f0ff" },
-    { id: "quest", l: "Quest", icon: "⚔", c: "#f9ca24" },
-    { id: "cristina", l: "Cri", icon: "♥", c: "#ff3366" },
-    { id: "work", l: "Work", icon: "◆", c: "#7b2ff7" },
-    { id: "english", l: "ENG", icon: "A", c: "#f97316" },
-    { id: "eko", l: "Eko", icon: "✦", c: "#00f0ff" },
-    { id: "sys", l: "Sys", icon: "⚙", c: "#22c55e" },
-  ];
+  // Time-based greeting
+  const hour = oggi.getHours();
+  const timeSlot = hour < 6 ? "night" : hour < 12 ? "morning" : hour < 18 ? "afternoon" : hour < 23 ? "evening" : "night";
+  const greeting = GREETINGS[timeSlot][Math.floor(oggi.getDate() % GREETINGS[timeSlot].length)];
+  const quote = QUOTES[Math.floor((oggi.getDate() + oggi.getMonth()) % QUOTES.length)];
 
   const statColors = { disciplina: "#f9ca24", corpo: "#ff3366", mente: "#00f0ff", spirito: "#7b2ff7", carisma: "#ec4899", resistenza: "#22c55e" };
   const questColors = { corpo: "#ff3366", mente: "#00f0ff", disciplina: "#f9ca24", salute: "#22c55e", spirito: "#7b2ff7", carisma: "#ec4899", cuore: "#ff3366" };
 
-  return (
-    <div className="min-h-screen relative overflow-hidden font-sans" style={{ background: "linear-gradient(180deg, #020810 0%, #060d1a 30%, #0a0e1f 60%, #050a14 100%)", color: "#c8d8e8" }}>
+  const tabs = [
+    { id: "home", icon: "◈", l: "Home", c: "#00f0ff" },
+    { id: "quest", icon: "⚔", l: "Quest", c: "#f9ca24" },
+    { id: "life", icon: "♥", l: "Life", c: "#ff3366" },
+    { id: "eko", icon: "✦", l: "Eko", c: "#00f0ff" },
+    { id: "sys", icon: "⚙", l: "Sys", c: "#22c55e" },
+  ];
 
-      {/* Stars */}
-      <div className="fixed inset-0 z-0"><StarField /></div>
+  const lifeTabs = [
+    { id: "cristina", l: "Cristina", c: "#ff3366" },
+    { id: "work", l: "Work", c: "#7b2ff7" },
+    { id: "english", l: "English", c: "#f97316" },
+  ];
+
+  return (
+    <div className="min-h-screen relative font-sans" style={{ background: "#020810", color: "#c8d8e8" }}>
+      <StarField />
 
       {/* Toast */}
-      {msg && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 text-xs font-mono px-5 py-2.5 rounded-xl shadow-2xl"
-          style={{ background: "rgba(0,240,255,0.12)", border: "1px solid rgba(0,240,255,0.3)", color: "#00f0ff", backdropFilter: "blur(20px)" }}>
-          {msg}
-        </div>
-      )}
+      {msg && <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 text-xs font-mono px-5 py-2.5 rounded-xl" style={{ background: "rgba(0,240,255,0.12)", border: "1px solid rgba(0,240,255,0.3)", color: "#00f0ff", backdropFilter: "blur(20px)" }}>{msg}</div>}
 
       <div className="relative z-10 pb-20">
-        {/* Header */}
-        <div className="px-4 py-3 safe-area-top" style={{ borderBottom: "1px solid rgba(0,240,255,0.06)" }}>
-          <div className="flex justify-between items-center max-w-lg mx-auto">
-            <div>
-              <div className="text-[8px] tracking-[4px] font-mono" style={{ color: "rgba(0,240,255,0.4)" }}>PROTOCOLLO</div>
-              <div className="text-lg font-bold tracking-widest">
-                <span style={{ color: "#00f0ff" }}>F</span><span style={{ color: "#e0e8f0" }}>AUNO</span>
-                <span className="text-[9px] font-normal ml-2" style={{ color: "rgba(0,240,255,0.2)" }}>v3.0</span>
+
+        {/* ═══ HOME — CINEMATIC ═══ */}
+        {tab === "home" && (<>
+          {/* Hero: Earth + Greeting */}
+          <div className="earth-container">
+            {/* Earth */}
+            <div className="animate-float" style={{ position: "absolute" }}>
+              <div className="earth-atmosphere" />
+              <div className="earth-glow" />
+              <div className="earth-clip">
+                <div className="earth-continents animate-earth" />
               </div>
+              <div className="earth-horizon" />
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold font-mono" style={{ color: "#ff3366" }}>
-                {days}<span className="text-[10px] font-normal ml-0.5" style={{ color: "rgba(255,51,102,0.5)" }}>d</span>
+
+            {/* Greeting overlay */}
+            <div className="relative z-10 text-center px-6" style={{ marginTop: "12vh" }}>
+              <div className="animate-fade">
+                <div className="text-[9px] font-mono tracking-[6px] mb-3" style={{ color: "rgba(0,240,255,0.35)" }}>PROTOCOLLO : FAUNO</div>
+                <div className="text-2xl font-light mb-6" style={{ color: "rgba(224,232,240,0.9)" }}>{greeting}</div>
               </div>
-              <div className="text-[9px] font-mono" style={{ color: "rgba(0,240,255,0.4)" }}>EKO LVL{eko.livello}</div>
+              <div className="animate-fade-delay">
+                <div className="text-[13px] italic leading-relaxed max-w-[300px] mx-auto" style={{ color: "rgba(200,210,230,0.4)" }}>
+                  "{quote}"
+                </div>
+              </div>
+              <div className="animate-fade-delay2 mt-8 flex justify-center gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold font-mono" style={{ color: "#ff3366" }}>{days}</div>
+                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(255,51,102,0.5)" }}>DAYS LEFT</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold font-mono" style={{ color: "#f9ca24" }}>{qDone}/{quests.length}</div>
+                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(249,202,36,0.5)" }}>QUESTS</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold font-mono" style={{ color: "#00f0ff" }}>LV{eko.livello}</div>
+                  <div className="text-[8px] font-mono tracking-wider" style={{ color: "rgba(0,240,255,0.5)" }}>EKO</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="px-4 py-3 max-w-lg mx-auto">
-
-          {/* ═══ HOME ═══ */}
-          {tab === "main" && (<>
-            {/* Hero */}
-            <div className="relative flex flex-col items-center justify-center py-10 mb-4">
-              <div className="animate-float">
-                <div className="w-32 h-32 rounded-full" style={{ background: "radial-gradient(circle at 35% 35%, #1a4a7a 0%, #0d2847 40%, #061428 75%, #020a14 100%)", boxShadow: "0 0 60px rgba(0,180,255,0.15), inset -15px -8px 30px rgba(0,0,0,0.8)" }} />
-              </div>
-              <div className="mt-4 text-center">
-                <div className="text-[10px] tracking-[6px] font-mono" style={{ color: "rgba(0,240,255,0.5)" }}>PROTOCOLLO</div>
-                <div className="text-3xl font-bold tracking-widest" style={{ textShadow: "0 0 40px rgba(0,240,255,0.2)" }}>
-                  <span style={{ color: "#00f0ff" }}>F</span><span style={{ color: "#e0e8f0" }}>AUNO</span>
-                </div>
-                <div className="text-[10px] font-mono mt-1" style={{ color: "rgba(0,240,255,0.35)" }}>POWERED BY EKO</div>
-                <div className="text-[11px] mt-4 italic max-w-[280px] mx-auto" style={{ color: "rgba(200,210,230,0.4)" }}>
-                  "All we have to decide is what to do with the time that is given us."
-                </div>
-              </div>
-            </div>
-
+          {/* Content below hero */}
+          <div className="px-4 max-w-lg mx-auto">
             {/* Character */}
             <Card>
               <div className="flex gap-3 items-center mb-3">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.15)" }}>🦌</div>
+                <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.12)" }}>🦌</div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold" style={{ color: "#e0e8f0" }}>{fauno.nome}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded font-mono" style={{ background: "rgba(0,240,255,0.08)", color: "#00f0ff", border: "1px solid rgba(0,240,255,0.15)" }}>LVL {fauno.livello}</span>
-                  </div>
-                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.35)" }}>{fauno.classe}</div>
+                  <div className="text-sm font-semibold" style={{ color: "#e0e8f0" }}>{fauno.nome} <span className="text-[9px] font-mono font-normal px-1.5 py-0.5 rounded ml-1" style={{ background: "rgba(0,240,255,0.06)", color: "rgba(0,240,255,0.6)", border: "1px solid rgba(0,240,255,0.1)" }}>LVL {fauno.livello}</span></div>
+                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.3)" }}>{fauno.classe}</div>
                 </div>
               </div>
-              <Bar label="❤ HP" val={fauno.hp.c} max={fauno.hp.m} color={fauno.hp.c > 50 ? "#22c55e" : "#ff3366"} />
+              <Bar label="HP" val={fauno.hp.c} max={fauno.hp.m} color={fauno.hp.c > 50 ? "#22c55e" : "#ff3366"} />
               {Object.entries(fauno.stats).map(([k, v]) => <Bar key={k} label={k.toUpperCase()} val={v} color={statColors[k]} />)}
             </Card>
 
             {/* Weight */}
-            <Card accent="rgba(255,51,102,0.3)">
-              <div className="flex justify-between mb-2">
-                <span className="text-[11px] font-semibold tracking-wider" style={{ color: "#ff3366" }}>⚖ BODY</span>
-                <span className="text-[10px] font-mono px-1.5 rounded" style={{ color: "rgba(255,51,102,0.6)", background: "rgba(255,51,102,0.08)" }}>-{kgLeft}kg</span>
-              </div>
+            <Card accent="rgba(255,51,102,0.25)">
               <div className="flex justify-between items-end mb-3">
-                <div className="text-3xl font-bold font-mono leading-none" style={{ color: "#e0e8f0" }}>{fauno.peso.attuale}<span className="text-xs ml-0.5" style={{ color: "rgba(200,210,230,0.3)" }}>kg</span></div>
-                <div className="text-[10px] font-mono text-right" style={{ color: "rgba(200,210,230,0.3)" }}>→ {fauno.peso.obiettivo}kg<br/>~{(kgLeft / Math.max(days / 7, 0.1)).toFixed(1)}kg/week</div>
+                <div>
+                  <div className="text-[10px] font-mono tracking-wider mb-1" style={{ color: "rgba(255,51,102,0.6)" }}>BODY</div>
+                  <div className="text-3xl font-bold font-mono leading-none" style={{ color: "#e0e8f0" }}>{fauno.peso.attuale}<span className="text-xs ml-0.5" style={{ color: "rgba(200,210,230,0.3)" }}>kg</span></div>
+                </div>
+                <div className="text-right text-[10px] font-mono" style={{ color: "rgba(200,210,230,0.25)" }}>→ {fauno.peso.obiettivo}kg<br/>-{kgLeft}kg left</div>
               </div>
-              <div className="h-2 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${wProg}%`, background: "linear-gradient(90deg, #ff3366, #f9ca24)" }} />
+              <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
+                <div className="h-full rounded-full" style={{ width: `${wProg}%`, background: "linear-gradient(90deg, #ff3366, #f9ca24)" }} />
               </div>
               <div className="flex gap-2">
                 <Input type="number" value={wIn} onChange={e => setWIn(e.target.value)} placeholder="Weight" />
                 <Btn onClick={saveWeight} color="#ff3366">Save</Btn>
               </div>
-              {fauno.pesoLog.length > 0 && <div className="text-[9px] font-mono mt-2" style={{ color: "rgba(200,210,230,0.25)" }}>{fauno.pesoLog.slice(-3).map(e => `${e.d}: ${e.p}kg`).join(" → ")}</div>}
             </Card>
+          </div>
+        </>)}
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-2">
-              {[{ v: `${qDone}/${quests.length}`, l: "Quest", c: "#f9ca24" }, { v: qXP, l: "XP", c: "#00f0ff" }, { v: `LV${eko.livello}`, l: "Eko", c: "#7b2ff7" }].map((x, i) => (
-                <Card key={i} className="!mb-0 text-center !p-3">
-                  <div className="text-lg font-bold font-mono" style={{ color: x.c }}>{x.v}</div>
-                  <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.3)" }}>{x.l}</div>
-                </Card>
-              ))}
-            </div>
-          </>)}
-
-          {/* ═══ QUESTS ═══ */}
-          {tab === "quest" && (<>
+        {/* ═══ QUESTS ═══ */}
+        {tab === "quest" && (
+          <div className="px-4 py-4 max-w-lg mx-auto">
             <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#f9ca24" }}>⚔ DAILY QUESTS</div>
             {quests.map(q => (
               <div key={q.id} onClick={() => !q.done && doQuest(q.id)}
                 className="rounded-xl p-3 mb-2 border cursor-pointer transition-all active:scale-[0.98]"
-                style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.08)", opacity: q.done ? 0.35 : 1, borderLeftWidth: 3, borderLeftColor: q.done ? "rgba(34,197,94,0.2)" : questColors[q.t] }}>
+                style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", opacity: q.done ? 0.35 : 1, borderLeftWidth: 3, borderLeftColor: q.done ? "rgba(34,197,94,0.2)" : questColors[q.t] }}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2.5">
                     <span className="text-base">{q.done ? "✅" : q.i}</span>
                     <div>
                       <div className="text-[12px] font-semibold" style={{ color: q.done ? "rgba(74,124,74,0.6)" : "#e0e8f0" }}>{q.n}</div>
-                      <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.25)" }}>{q.d}</div>
+                      <div className="text-[9px]" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
                     </div>
                   </div>
                   <span className="text-[11px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
                 </div>
               </div>
             ))}
-            <div className="text-[10px] font-mono mt-4 mb-3 pt-3" style={{ color: "rgba(200,210,230,0.3)", borderTop: "1px solid rgba(0,240,255,0.06)" }}>✦ EKO QUEST BOARD</div>
+            <div className="text-[10px] font-mono mt-5 mb-3 pt-3" style={{ color: "rgba(200,210,230,0.25)", borderTop: "1px solid rgba(0,240,255,0.06)" }}>✦ EKO QUEST BOARD</div>
             {eko.questEko.map(q => (
               <Card key={q.id} accent={q.s === "attesa" ? "#f9ca24" : q.s === "ok" ? "#22c55e" : "rgba(255,51,102,0.2)"} className="!p-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
-                      <span className="text-[8px] font-mono px-1 rounded" style={{ background: q.s === "attesa" ? "rgba(249,202,36,0.08)" : "rgba(34,197,94,0.08)", color: q.s === "attesa" ? "#f9ca24" : "#22c55e" }}>{q.s === "attesa" ? "PENDING" : q.s === "ok" ? "OK" : "NO"}</span>
-                      {q.priorita && <span className="text-[7px] font-mono px-1 rounded" style={{ color: "#ff3366", background: "rgba(255,51,102,0.08)" }}>📌 {q.priorita}</span>}
+                      <span className="text-[8px] font-mono px-1 rounded" style={{ background: q.s === "attesa" ? "rgba(249,202,36,0.08)" : "rgba(34,197,94,0.08)", color: q.s === "attesa" ? "#f9ca24" : "#22c55e" }}>{q.s === "attesa" ? "PENDING" : "OK"}</span>
                     </div>
-                    <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.25)" }}>{q.d}</div>
+                    <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.2)" }}>{q.d}</div>
                   </div>
-                  {q.s === "attesa" && (
-                    <div className="flex gap-1 ml-2">
-                      <Btn onClick={() => eqAct(q.id, "ok")} color="#22c55e">✓</Btn>
-                      <Btn onClick={() => eqAct(q.id, "no")} color="#ff3366">✗</Btn>
-                    </div>
-                  )}
+                  {q.s === "attesa" && <div className="flex gap-1 ml-2"><Btn onClick={() => eqAct(q.id, "ok")} color="#22c55e">✓</Btn><Btn onClick={() => eqAct(q.id, "no")} color="#ff3366">✗</Btn></div>}
                 </div>
               </Card>
             ))}
-          </>)}
+          </div>
+        )}
 
-          {/* ═══ CRISTINA ═══ */}
-          {tab === "cristina" && (<>
-            <Card accent="#ff3366">
-              <div className="text-[11px] font-mono tracking-widest mb-3" style={{ color: "#ff3366" }}>♥ CRISTINA — Care Module</div>
-              <div className="text-[10px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.4)" }}>13 years together. Co-founder. Your #1 priority. This module exists to remind you she comes first.</div>
-              <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(255,51,102,0.04)", border: "1px solid rgba(255,51,102,0.08)" }}>
-                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.7)" }}>💭 TODAY'S REMINDER</div>
-                <div className="text-[11px] italic leading-relaxed" style={{ color: "rgba(200,210,230,0.6)" }}>{cristina.promemoria[Math.floor(oggi.getDate() % cristina.promemoria.length)]}</div>
-              </div>
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.7)" }}>🌹 LOG A CARE GESTURE</div>
-              <div className="flex gap-2">
-                <Input value={cGesto} onChange={e => setCGesto(e.target.value)} placeholder="What did you do for her?" />
-                <Btn onClick={addCristinaGesto} color="#ff3366">+</Btn>
-              </div>
-              {cristina.gestaRecenti.length > 0 && <div className="mt-2 space-y-1">{cristina.gestaRecenti.slice(-5).map((g, i) => <div key={i} className="text-[9px] font-mono pl-2" style={{ color: "rgba(200,210,230,0.3)", borderLeft: "2px solid rgba(255,51,102,0.2)" }}>{g.t}: {g.g}</div>)}</div>}
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.7)" }}>📝 RELATIONSHIP NOTES</div>
-              <div className="flex gap-2">
-                <Input value={cNote} onChange={e => setCNote(e.target.value)} placeholder="Note..." />
-                <Btn onClick={addCristinaNote} color="#ff3366">+</Btn>
-              </div>
-              {cristina.noteRelazione.length > 0 && <div className="mt-2 space-y-1">{cristina.noteRelazione.slice(-5).map((n, i) => <div key={i} className="text-[9px] font-mono pl-2" style={{ color: "rgba(200,210,230,0.3)", borderLeft: "2px solid rgba(255,51,102,0.2)" }}>{n.t}: {n.n}</div>)}</div>}
-            </Card>
-          </>)}
+        {/* ═══ LIFE (Cristina + Work + English) ═══ */}
+        {tab === "life" && (
+          <div className="px-4 py-4 max-w-lg mx-auto">
+            <SubTabs tabs={lifeTabs} active={lifeSub} onChange={setLifeSub} />
 
-          {/* ═══ WORK ═══ */}
-          {tab === "work" && (<>
-            <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#7b2ff7" }}>◆ UNIVERSIDATA</div>
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>📋 ACTIVE TASKS</div>
-              <div className="flex gap-2 mb-2">
-                <Input value={uTask} onChange={e => setUTask(e.target.value)} placeholder="New task..." onKeyDown={e => e.key === "Enter" && addUTask()} />
-                <Btn onClick={addUTask} color="#7b2ff7">+</Btn>
-              </div>
-              {universidata.taskAttivi.length === 0 && <div className="text-[9px] italic" style={{ color: "rgba(200,210,230,0.2)" }}>No tasks. Add one.</div>}
-              {universidata.taskAttivi.map(t => (
-                <div key={t.id} onClick={() => togUTask(t.id)} className="flex items-center gap-2 py-2 cursor-pointer" style={{ borderBottom: "1px solid rgba(0,240,255,0.04)" }}>
-                  <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-[10px]" style={{ border: `1px solid ${t.done ? "#22c55e" : "rgba(200,210,230,0.15)"}`, background: t.done ? "rgba(34,197,94,0.08)" : "transparent", color: "#22c55e" }}>{t.done && "✓"}</div>
-                  <span className="text-[11px] flex-1" style={{ color: t.done ? "rgba(200,210,230,0.2)" : "#d0d8e4", textDecoration: t.done ? "line-through" : "none" }}>{t.t}</span>
+            {/* CRISTINA */}
+            {lifeSub === "cristina" && (<>
+              <Card accent="#ff3366">
+                <div className="text-[11px] font-mono tracking-widest mb-3" style={{ color: "#ff3366" }}>♥ CRISTINA</div>
+                <div className="text-[10px] mb-3 leading-relaxed" style={{ color: "rgba(200,210,230,0.35)" }}>13 years. Co-founder. Priority #1.</div>
+                <div className="rounded-lg p-3" style={{ background: "rgba(255,51,102,0.03)", border: "1px solid rgba(255,51,102,0.06)" }}>
+                  <div className="text-[10px] font-mono mb-1.5" style={{ color: "rgba(255,51,102,0.6)" }}>💭 TODAY</div>
+                  <div className="text-[11px] italic" style={{ color: "rgba(200,210,230,0.5)" }}>{cristina.promemoria[Math.floor(oggi.getDate() % cristina.promemoria.length)]}</div>
                 </div>
-              ))}
-            </Card>
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>🧠 STRATEGIC NOTES</div>
-              <div className="flex gap-2 mb-2">
-                <Input value={uNote} onChange={e => setUNote(e.target.value)} placeholder="Idea, decision, insight..." onKeyDown={e => e.key === "Enter" && addUNote()} />
-                <Btn onClick={addUNote} color="#7b2ff7">+</Btn>
-              </div>
-              {universidata.noteStrategiche.map((n, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1.5" style={{ color: "rgba(200,210,230,0.3)", borderLeft: "2px solid rgba(123,47,247,0.2)" }}>{n.t}: {n.n}</div>)}
-            </Card>
-          </>)}
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.6)" }}>🌹 CARE GESTURE</div>
+                <div className="flex gap-2">
+                  <Input value={cGesto} onChange={e => setCGesto(e.target.value)} placeholder="What did you do for her?" />
+                  <Btn onClick={addCristinaGesto} color="#ff3366">+</Btn>
+                </div>
+                {cristina.gestaRecenti.slice(-5).map((g, i) => <div key={i} className="text-[9px] font-mono pl-2 mt-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(255,51,102,0.15)" }}>{g.t}: {g.g}</div>)}
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(255,51,102,0.6)" }}>📝 NOTES</div>
+                <div className="flex gap-2">
+                  <Input value={cNote} onChange={e => setCNote(e.target.value)} placeholder="Note..." />
+                  <Btn onClick={addCristinaNote} color="#ff3366">+</Btn>
+                </div>
+                {cristina.noteRelazione.slice(-5).map((n, i) => <div key={i} className="text-[9px] font-mono pl-2 mt-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(255,51,102,0.15)" }}>{n.t}: {n.n}</div>)}
+              </Card>
+            </>)}
 
-          {/* ═══ ENGLISH ═══ */}
-          {tab === "english" && (<>
-            <Card accent="#f97316">
-              <div className="flex justify-between items-center mb-3">
-                <div>
-                  <div className="text-[11px] font-mono tracking-widest" style={{ color: "#f97316" }}>A ENGLISH LITERACY</div>
-                  <div className="text-[9px] mt-0.5" style={{ color: "rgba(200,210,230,0.3)" }}>{english.level}</div>
+            {/* WORK */}
+            {lifeSub === "work" && (<>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>📋 TASKS</div>
+                <div className="flex gap-2 mb-2">
+                  <Input value={uTask} onChange={e => setUTask(e.target.value)} placeholder="New task..." onKeyDown={e => e.key === "Enter" && addUTask()} />
+                  <Btn onClick={addUTask} color="#7b2ff7">+</Btn>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold font-mono" style={{ color: "#f97316" }}>{english.streak}<span className="text-[10px] ml-0.5" style={{ color: "rgba(249,115,22,0.5)" }}>d</span></div>
-                  <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>BEST: {english.bestStreak}</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {[{ v: english.totalCompleted, l: "Done" }, { v: english.vocabLog.length, l: "Words" }, { v: english.focusToday === "business" ? "BIZ" : "CONV", l: "Focus" }].map((x, i) => (
-                  <div key={i} className="text-center rounded-lg p-2" style={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.1)" }}>
-                    <div className="text-sm font-bold font-mono" style={{ color: "#f97316" }}>{x.v}</div>
-                    <div className="text-[8px]" style={{ color: "rgba(200,210,230,0.25)" }}>{x.l}</div>
+                {universidata.taskAttivi.length === 0 && <div className="text-[9px] italic" style={{ color: "rgba(200,210,230,0.15)" }}>No tasks yet.</div>}
+                {universidata.taskAttivi.map(t => (
+                  <div key={t.id} onClick={() => togUTask(t.id)} className="flex items-center gap-2 py-2 cursor-pointer" style={{ borderBottom: "1px solid rgba(0,240,255,0.03)" }}>
+                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-[10px]" style={{ border: `1px solid ${t.done ? "#22c55e" : "rgba(200,210,230,0.12)"}`, color: "#22c55e" }}>{t.done && "✓"}</div>
+                    <span className="text-[11px] flex-1" style={{ color: t.done ? "rgba(200,210,230,0.2)" : "#d0d8e4", textDecoration: t.done ? "line-through" : "none" }}>{t.t}</span>
                   </div>
                 ))}
-              </div>
-              {english.completedToday && <div className="mt-3 text-center rounded-lg py-2 text-[10px]" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.15)", color: "#22c55e" }}>Today's challenge completed ✓</div>}
-            </Card>
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>🧠 STRATEGIC NOTES</div>
+                <div className="flex gap-2 mb-2">
+                  <Input value={uNote} onChange={e => setUNote(e.target.value)} placeholder="Idea, insight..." onKeyDown={e => e.key === "Enter" && addUNote()} />
+                  <Btn onClick={addUNote} color="#7b2ff7">+</Btn>
+                </div>
+                {universidata.noteStrategiche.map((n, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1.5" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(123,47,247,0.15)" }}>{n.t}: {n.n}</div>)}
+              </Card>
+            </>)}
 
-            <Card>
-              <div className="text-[10px] font-mono mb-3" style={{ color: "rgba(249,115,22,0.7)" }}>{english.focusToday === "business" ? "💼" : "💬"} DAILY CHALLENGE</div>
-              {!engShowChallenge ? (
-                <Btn onClick={getEngChallenge} color="#f97316" full>{english.completedToday ? "Practice more (bonus)" : "Start today's challenge"}</Btn>
-              ) : engChallenge?.type === "write" ? (
-                <div>
-                  <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.1)" }}>
-                    <div className="text-[12px] leading-relaxed mb-2" style={{ color: "rgba(200,210,230,0.7)" }}>{engChallenge.prompt}</div>
-                    <div className="text-[9px] italic" style={{ color: "rgba(249,115,22,0.5)" }}>Tip: {engChallenge.tip}</div>
+            {/* ENGLISH */}
+            {lifeSub === "english" && (<>
+              <Card accent="#f97316">
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    <div className="text-[11px] font-mono tracking-widest" style={{ color: "#f97316" }}>ENGLISH</div>
+                    <div className="text-[9px] mt-0.5" style={{ color: "rgba(200,210,230,0.25)" }}>{english.level}</div>
                   </div>
-                  <textarea value={engResponse} onChange={e => setEngResponse(e.target.value)} placeholder="Write your answer in English..." rows={4}
-                    className="w-full rounded-lg px-3 py-2.5 text-sm font-mono text-white outline-none border resize-none mb-2"
-                    style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(249,115,22,0.15)", color: "#e0e8f0" }} />
-                  <div className="flex gap-2">
-                    <Btn onClick={completeEngChallenge} color="#22c55e" full disabled={!engResponse.trim()}>Submit</Btn>
-                    <Btn onClick={() => { setEngShowChallenge(false); setEngResponse(""); }} color="rgba(200,210,230,0.3)">Skip</Btn>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold font-mono" style={{ color: "#f97316" }}>{english.streak}<span className="text-[10px] ml-0.5" style={{ color: "rgba(249,115,22,0.4)" }}>d</span></div>
+                    <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.15)" }}>BEST: {english.bestStreak}</div>
                   </div>
                 </div>
-              ) : (
-                <div>
-                  <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.1)" }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg font-bold" style={{ color: "#f97316" }}>{engChallenge.word}</span>
-                      <span className="text-[8px] font-mono px-1.5 rounded" style={{ background: "rgba(249,115,22,0.08)", color: "rgba(249,115,22,0.6)" }}>{engChallenge.category}</span>
+                {english.completedToday && <div className="text-center rounded-lg py-2 text-[10px]" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.12)", color: "#22c55e" }}>Done for today ✓</div>}
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-3" style={{ color: "rgba(249,115,22,0.6)" }}>{english.focusToday === "business" ? "💼 BUSINESS" : "💬 CONVERSATIONAL"} CHALLENGE</div>
+                {!engShowChallenge ? (
+                  <Btn onClick={getEngChallenge} color="#f97316" full>{english.completedToday ? "Bonus round" : "Start challenge"}</Btn>
+                ) : engChallenge?.type === "write" ? (
+                  <div>
+                    <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
+                      <div className="text-[12px] leading-relaxed mb-2" style={{ color: "rgba(200,210,230,0.6)" }}>{engChallenge.prompt}</div>
+                      <div className="text-[9px] italic" style={{ color: "rgba(249,115,22,0.4)" }}>Tip: {engChallenge.tip}</div>
                     </div>
-                    <div className="text-[11px] mb-2" style={{ color: "rgba(200,210,230,0.6)" }}>{engChallenge.def}</div>
-                    <div className="text-[10px] italic pl-2" style={{ color: "rgba(200,210,230,0.4)", borderLeft: "2px solid rgba(249,115,22,0.2)" }}>"{engChallenge.example}"</div>
+                    <textarea value={engResponse} onChange={e => setEngResponse(e.target.value)} placeholder="Write in English..." rows={3}
+                      className="w-full rounded-lg px-3 py-2.5 text-sm font-mono text-white outline-none border resize-none mb-2"
+                      style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(249,115,22,0.12)" }} />
+                    <div className="flex gap-2">
+                      <Btn onClick={completeEngChallenge} color="#22c55e" full disabled={!engResponse.trim()}>Submit</Btn>
+                      <Btn onClick={() => { setEngShowChallenge(false); setEngResponse(""); }} color="rgba(200,210,230,0.3)">Skip</Btn>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Btn onClick={completeEngChallenge} color="#22c55e" full>Got it!</Btn>
-                    <Btn onClick={getEngChallenge} color="#f97316">Next</Btn>
+                ) : (
+                  <div>
+                    <div className="rounded-lg p-3 mb-3" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
+                      <div className="text-lg font-bold mb-1" style={{ color: "#f97316" }}>{engChallenge.word}</div>
+                      <div className="text-[11px] mb-2" style={{ color: "rgba(200,210,230,0.5)" }}>{engChallenge.def}</div>
+                      <div className="text-[10px] italic pl-2" style={{ borderLeft: "2px solid rgba(249,115,22,0.15)", color: "rgba(200,210,230,0.35)" }}>"{engChallenge.example}"</div>
+                    </div>
+                    <div className="flex gap-2"><Btn onClick={completeEngChallenge} color="#22c55e" full>Got it!</Btn><Btn onClick={getEngChallenge} color="#f97316">Next</Btn></div>
                   </div>
+                )}
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.6)" }}>🎯 IDIOM</div>
+                {engIdiom ? (
+                  <div className="rounded-lg p-3" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.06)" }}>
+                    <div className="text-[13px] font-bold mb-1" style={{ color: "#f97316" }}>"{engIdiom.idiom}"</div>
+                    <div className="text-[10px] mb-1" style={{ color: "rgba(200,210,230,0.4)" }}>{engIdiom.meaning}</div>
+                    <div className="text-[10px] italic pl-2" style={{ borderLeft: "2px solid rgba(249,115,22,0.1)", color: "rgba(200,210,230,0.3)" }}>{engIdiom.example}</div>
+                    <button onClick={getEngIdiom} className="mt-2 text-[9px] font-mono px-2 py-1 rounded cursor-pointer" style={{ color: "rgba(249,115,22,0.4)", border: "1px solid rgba(249,115,22,0.08)" }}>Another</button>
+                  </div>
+                ) : <Btn onClick={getEngIdiom} color="#f97316" full>Show idiom</Btn>}
+              </Card>
+              <Card>
+                <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.6)" }}>📚 VOCABULARY</div>
+                <div className="flex gap-2 mb-2">
+                  <Input value={engVocabWord} onChange={e => setEngVocabWord(e.target.value)} placeholder="New word..." onKeyDown={e => e.key === "Enter" && addEngVocab()} />
+                  <Btn onClick={addEngVocab} color="#f97316">+</Btn>
                 </div>
-              )}
-            </Card>
+                {english.vocabLog.slice(-6).reverse().map((v, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1" style={{ borderLeft: "2px solid rgba(249,115,22,0.1)" }}><span style={{ color: "#f97316" }}>{v.w}</span> <span style={{ color: "rgba(200,210,230,0.12)" }}>· {v.d}</span></div>)}
+              </Card>
+            </>)}
+          </div>
+        )}
 
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.7)" }}>🎯 IDIOM OF THE DAY</div>
-              {engIdiom ? (
-                <div className="rounded-lg p-3" style={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.08)" }}>
-                  <div className="text-[13px] font-bold mb-1" style={{ color: "#f97316" }}>"{engIdiom.idiom}"</div>
-                  <div className="text-[10px] mb-2" style={{ color: "rgba(200,210,230,0.5)" }}>{engIdiom.meaning}</div>
-                  <div className="text-[10px] italic pl-2" style={{ color: "rgba(200,210,230,0.35)", borderLeft: "2px solid rgba(249,115,22,0.15)" }}>{engIdiom.example}</div>
-                  <button onClick={getEngIdiom} className="mt-2 text-[9px] font-mono px-2 py-1 rounded cursor-pointer" style={{ color: "rgba(249,115,22,0.5)", border: "1px solid rgba(249,115,22,0.1)" }}>Another one</button>
-                </div>
-              ) : <Btn onClick={getEngIdiom} color="#f97316" full>Show me an idiom</Btn>}
-            </Card>
-
-            <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.7)" }}>📚 MY VOCABULARY</div>
-              <div className="flex gap-2 mb-2">
-                <Input value={engVocabWord} onChange={e => setEngVocabWord(e.target.value)} placeholder="New word or phrase..." onKeyDown={e => e.key === "Enter" && addEngVocab()} />
-                <Btn onClick={addEngVocab} color="#f97316">+</Btn>
-              </div>
-              {english.vocabLog.length === 0 && <div className="text-[9px] italic" style={{ color: "rgba(200,210,230,0.2)" }}>No words yet. Start collecting!</div>}
-              {english.vocabLog.slice(-8).reverse().map((v, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1" style={{ borderLeft: "2px solid rgba(249,115,22,0.15)" }}><span style={{ color: "#f97316" }}>{v.w}</span> <span style={{ color: "rgba(200,210,230,0.15)" }}>· {v.d}</span></div>)}
-            </Card>
-          </>)}
-
-          {/* ═══ EKO ═══ */}
-          {tab === "eko" && (<>
+        {/* ═══ EKO ═══ */}
+        {tab === "eko" && (
+          <div className="px-4 py-4 max-w-lg mx-auto">
             <Card>
               <div className="flex gap-3 items-center mb-3">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.2)" }}>✦</div>
+                <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(0,240,255,0.05)", border: "1px solid rgba(0,240,255,0.15)", fontSize: 18 }}>✦</div>
                 <div>
-                  <div className="text-sm font-bold"><span style={{ color: "#e0e8f0" }}>Eko</span> <span className="text-[10px] font-normal" style={{ color: "rgba(0,240,255,0.5)" }}>"{eko.titolo}"</span></div>
-                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.3)" }}>LVL {eko.livello} · {eko.xp}/{eko.xpMax} XP</div>
+                  <div className="text-sm font-semibold"><span style={{ color: "#e0e8f0" }}>Eko</span> <span className="text-[10px] font-normal" style={{ color: "rgba(0,240,255,0.4)" }}>"{eko.titolo}"</span></div>
+                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.25)" }}>LVL {eko.livello} · {eko.xp}/{eko.xpMax} XP</div>
                 </div>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: "rgba(255,255,255,0.04)" }}>
@@ -711,62 +649,57 @@ function App() {
               </div>
               <div className="flex gap-2 mb-3">
                 <Input type="number" value={xIn} onChange={e => setXIn(e.target.value)} placeholder="XP" />
-                <Btn onClick={giveXP}>Grant XP</Btn>
+                <Btn onClick={giveXP}>Grant</Btn>
               </div>
               <div className="flex gap-1 flex-wrap">
-                {eko.tratti.map(t => <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: "rgba(0,240,255,0.05)", color: "rgba(0,240,255,0.6)", border: "1px solid rgba(0,240,255,0.1)" }}>{t}</span>)}
+                {eko.tratti.map(t => <span key={t} className="text-[8px] px-1.5 py-0.5 rounded" style={{ background: "rgba(0,240,255,0.04)", color: "rgba(0,240,255,0.5)", border: "1px solid rgba(0,240,255,0.08)" }}>{t}</span>)}
               </div>
             </Card>
-
             <Card>
-              <div className="text-[10px] font-mono tracking-widest mb-4" style={{ color: "#00f0ff" }}>🎛 PERSONALITY</div>
-              {Object.entries(eko.personalita).map(([k, v]) => {
-                const p = PERS[k];
-                return (
-                  <div key={k} className="mb-4">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[11px]" style={{ color: "rgba(200,210,230,0.6)" }}>{p.i} {p.n}</span>
-                      <span className="text-[11px] font-mono font-bold" style={{ color: "#00f0ff" }}>{v}</span>
-                    </div>
-                    <input type="range" min="0" max="10" value={v} onChange={e => updPers(k, parseInt(e.target.value))} className="w-full" />
-                    <div className="flex justify-between text-[8px] mt-0.5" style={{ color: "rgba(200,210,230,0.2)" }}><span>{p.lo}</span><span>{p.hi}</span></div>
+              <div className="text-[10px] font-mono tracking-widest mb-4" style={{ color: "#00f0ff" }}>PERSONALITY</div>
+              {Object.entries(eko.personalita).map(([k, v]) => { const p = PERS[k]; return (
+                <div key={k} className="mb-3.5">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[11px]" style={{ color: "rgba(200,210,230,0.5)" }}>{p.i} {p.n}</span>
+                    <span className="text-[11px] font-mono font-bold" style={{ color: "#00f0ff" }}>{v}</span>
                   </div>
-                );
-              })}
+                  <input type="range" min="0" max="10" value={v} onChange={e => updPers(k, parseInt(e.target.value))} className="w-full" />
+                  <div className="flex justify-between text-[8px] mt-0.5" style={{ color: "rgba(200,210,230,0.15)" }}><span>{p.lo}</span><span>{p.hi}</span></div>
+                </div>
+              ); })}
             </Card>
-
             <Card>
               <div className="text-[10px] font-mono mb-3" style={{ color: "#7b2ff7" }}>🔮 CURIOSITY</div>
               {showQ ? (
-                <div className="rounded-lg p-3" style={{ background: "rgba(123,47,247,0.04)", border: "1px solid rgba(123,47,247,0.1)" }}>
-                  <div className="text-[12px] leading-relaxed mb-2" style={{ color: "rgba(200,210,230,0.7)" }}>{q}</div>
-                  <div className="text-[9px] italic mb-2" style={{ color: "rgba(200,210,230,0.2)" }}>Answer in chat to feed me.</div>
+                <div className="rounded-lg p-3" style={{ background: "rgba(123,47,247,0.03)", border: "1px solid rgba(123,47,247,0.08)" }}>
+                  <div className="text-[12px] leading-relaxed mb-2" style={{ color: "rgba(200,210,230,0.6)" }}>{q}</div>
                   <Btn onClick={() => setShowQ(false)} color="rgba(200,210,230,0.3)">Close</Btn>
                 </div>
-              ) : <Btn onClick={() => { setQ(QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)]); setShowQ(true); }} color="#7b2ff7" full>Eko wants to ask you something...</Btn>}
+              ) : <Btn onClick={() => { setQ(QUOTES[Math.floor(Math.random() * QUOTES.length)]); setShowQ(true); }} color="#7b2ff7" full>Eko wants to ask you something...</Btn>}
             </Card>
-
             <Card>
-              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(200,210,230,0.3)" }}>🧠 PERMANENT MEMORY</div>
-              {eko.memoria.map((m, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1" style={{ color: "rgba(200,210,230,0.25)", borderLeft: "2px solid rgba(0,240,255,0.1)" }}>• {m}</div>)}
+              <div className="text-[10px] font-mono mb-2" style={{ color: "rgba(200,210,230,0.2)" }}>🧠 MEMORY</div>
+              {eko.memoria.map((m, i) => <div key={i} className="text-[9px] font-mono pl-2 mb-1" style={{ color: "rgba(200,210,230,0.2)", borderLeft: "2px solid rgba(0,240,255,0.08)" }}>• {m}</div>)}
             </Card>
-          </>)}
+          </div>
+        )}
 
-          {/* ═══ SYSTEM ═══ */}
-          {tab === "sys" && (<>
-            <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>🔄 SCHEDULER</div>
+        {/* ═══ SYSTEM ═══ */}
+        {tab === "sys" && (
+          <div className="px-4 py-4 max-w-lg mx-auto">
+            <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#22c55e" }}>SCHEDULER</div>
             {scheduler.map(t => (
-              <div key={t.id} className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-1.5" style={{ background: "rgba(8,12,24,0.85)", border: "1px solid rgba(0,240,255,0.06)" }}>
+              <div key={t.id} className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-1.5" style={{ background: "rgba(8,12,24,0.85)", border: "1px solid rgba(0,240,255,0.04)" }}>
                 <Toggle on={t.on} onClick={() => togSch(t.id)} />
                 <div className="flex-1 min-w-0">
                   <div className="text-[11px] font-semibold" style={{ color: t.on ? "#e0e8f0" : "rgba(200,210,230,0.2)" }}>{t.n}</div>
-                  <div className="text-[9px] truncate" style={{ color: "rgba(200,210,230,0.2)" }}>{t.d}</div>
+                  <div className="text-[9px] truncate" style={{ color: "rgba(200,210,230,0.15)" }}>{t.d}</div>
                 </div>
-                <div className="text-[9px] font-mono flex-shrink-0" style={{ color: "rgba(200,210,230,0.3)" }}>{t.f}</div>
+                <div className="text-[9px] font-mono" style={{ color: "rgba(200,210,230,0.2)" }}>{t.f}</div>
               </div>
             ))}
 
-            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#22c55e" }}>💡 EKO PROPOSALS</div>
+            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#22c55e" }}>PROPOSALS</div>
             {improvements.map(imp => {
               const ic = { critico: "#ff3366", alto: "#f9ca24", medio: "#00f0ff" };
               return (
@@ -776,60 +709,43 @@ function App() {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span>{imp.stato === "proposta" ? "💡" : imp.stato === "approvata" ? "✅" : "❌"}</span>
                         <span className="text-[11px] font-semibold" style={{ color: "#e0e8f0" }}>{imp.titolo}</span>
-                        <span className="text-[8px] font-mono px-1 rounded" style={{ background: `${ic[imp.impatto]}0a`, color: ic[imp.impatto] }}>{imp.impatto.toUpperCase()}</span>
+                        <span className="text-[8px] font-mono px-1 rounded" style={{ background: `${ic[imp.impatto]}08`, color: ic[imp.impatto] }}>{imp.impatto.toUpperCase()}</span>
                       </div>
-                      <div className="text-[9px] mt-1 leading-relaxed" style={{ color: "rgba(200,210,230,0.3)" }}>{imp.desc}</div>
+                      <div className="text-[9px] mt-1" style={{ color: "rgba(200,210,230,0.25)" }}>{imp.desc}</div>
                     </div>
-                    {imp.stato === "proposta" && (
-                      <div className="flex gap-1 ml-2">
-                        <Btn onClick={() => impAct(imp.id, "approvata")} color="#22c55e">SI</Btn>
-                        <Btn onClick={() => impAct(imp.id, "rifiutata")} color="#ff3366">NO</Btn>
-                      </div>
-                    )}
+                    {imp.stato === "proposta" && <div className="flex gap-1 ml-2"><Btn onClick={() => impAct(imp.id, "approvata")} color="#22c55e">SI</Btn><Btn onClick={() => impAct(imp.id, "rifiutata")} color="#ff3366">NO</Btn></div>}
                   </div>
                 </Card>
               );
             })}
 
             <Card className="mt-4">
-              <div className="text-[10px] font-mono tracking-widest mb-3" style={{ color: "#f9ca24" }}>💾 DATA</div>
+              <div className="text-[10px] font-mono mb-3" style={{ color: "#f9ca24" }}>DATA</div>
               <div className="flex gap-2">
-                <Btn onClick={exportState} color="#f9ca24" full>📤 Export</Btn>
-                <label className="flex-1">
-                  <div className="text-[11px] font-mono py-2.5 px-4 rounded-lg cursor-pointer text-center" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.4)", color: "#22c55e" }}>📥 Import</div>
-                  <input type="file" accept=".json" onChange={importState} className="hidden" />
-                </label>
+                <Btn onClick={exportState} color="#f9ca24" full>Export</Btn>
+                <label className="flex-1"><div className="text-[11px] font-mono py-2.5 px-4 rounded-lg cursor-pointer text-center" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e" }}>Import</div><input type="file" accept=".json" onChange={importState} className="hidden" /></label>
               </div>
             </Card>
 
-            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#00f0ff" }}>📊 LOG</div>
-            {log.slice(0, 15).map((e, i) => {
-              const lc = { system: "rgba(200,210,230,0.15)", eko: "#7b2ff7", quest: "#f9ca24", xp: "#00f0ff", body: "#ff3366", cuore: "#ff3366", english: "#f97316" };
-              return (
-                <div key={i} className="pl-2 mb-1.5" style={{ borderLeft: `2px solid ${lc[e.c] || "rgba(200,210,230,0.1)"}` }}>
-                  <div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.15)" }}>{e.t}</div>
-                  <div className="text-[10px]" style={{ color: "rgba(200,210,230,0.4)" }}>{e.x}</div>
-                </div>
-              );
+            <div className="text-[10px] font-mono tracking-widest mt-5 mb-3" style={{ color: "#00f0ff" }}>LOG</div>
+            {log.slice(0, 12).map((e, i) => {
+              const lc = { system: "rgba(200,210,230,0.1)", eko: "#7b2ff7", quest: "#f9ca24", xp: "#00f0ff", body: "#ff3366", cuore: "#ff3366", english: "#f97316" };
+              return <div key={i} className="pl-2 mb-1.5" style={{ borderLeft: `2px solid ${lc[e.c] || "rgba(200,210,230,0.08)"}` }}><div className="text-[8px] font-mono" style={{ color: "rgba(200,210,230,0.12)" }}>{e.t}</div><div className="text-[10px]" style={{ color: "rgba(200,210,230,0.35)" }}>{e.x}</div></div>;
             })}
-          </>)}
-
-        </div>
-
-        {/* Footer spacer */}
-        <div className="h-4"></div>
+          </div>
+        )}
       </div>
 
-      {/* Bottom Nav — Fixed */}
-      <div className="fixed bottom-0 left-0 right-0 z-50" style={{ background: "rgba(2,8,16,0.95)", borderTop: "1px solid rgba(0,240,255,0.08)", backdropFilter: "blur(20px)" }}>
-        <div className="flex max-w-lg mx-auto safe-area-bottom">
+      {/* ═══ BOTTOM NAV ═══ */}
+      <div className="fixed bottom-0 left-0 right-0 z-50" style={{ background: "rgba(2,8,16,0.95)", borderTop: "1px solid rgba(0,240,255,0.06)", backdropFilter: "blur(20px)" }}>
+        <div className="flex max-w-lg mx-auto">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex-1 py-2.5 flex flex-col items-center cursor-pointer transition-all active:scale-95"
-              style={{ color: tab === t.id ? t.c : "rgba(200,210,230,0.2)" }}>
-              <span className="text-base leading-none">{t.icon}</span>
-              <span className="text-[8px] mt-0.5 font-mono">{t.l}</span>
-              {tab === t.id && <div className="w-4 h-0.5 rounded-full mt-1" style={{ background: t.c }} />}
+              className="flex-1 py-3 flex flex-col items-center cursor-pointer transition-all active:scale-95"
+              style={{ color: tab === t.id ? t.c : "rgba(200,210,230,0.15)" }}>
+              <span className="text-lg leading-none">{t.icon}</span>
+              <span className="text-[8px] mt-1 font-mono">{t.l}</span>
+              {tab === t.id && <div className="w-5 h-0.5 rounded-full mt-1" style={{ background: t.c }} />}
             </button>
           ))}
         </div>
