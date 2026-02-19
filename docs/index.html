@@ -21,12 +21,20 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     body { margin: 0; background: #020810; overflow-x: hidden; }
-    input[type="range"] { -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; outline: none; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #00f0ff; cursor: pointer; }
-    textarea:focus, input:focus { outline: none; border-color: rgba(0,240,255,0.3) !important; }
+    input[type="range"] { -webkit-appearance: none; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #5cc8e6; cursor: pointer; box-shadow: 0 0 8px rgba(92,200,230,0.3); }
+    textarea:focus, input:focus { outline: none; border-color: rgba(92,200,230,0.4) !important; box-shadow: 0 0 0 2px rgba(92,200,230,0.15); }
+    /* Focus-visible for keyboard navigation */
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid #5cc8e6; outline-offset: 2px;
+    }
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
 
     /* Cinematic Earth — compact */
-    .earth-container { position: relative; width: 100%; height: 42vh; min-height: 260px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .earth-container { position: relative; width: 100%; height: 30vh; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .earth-glow { position: absolute; width: 220px; height: 220px; border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #1a5a8a 0%, #0d3050 25%, #071e38 50%, #030e1c 75%, #010509 100%);
       box-shadow: 0 0 120px 40px rgba(0,120,255,0.08), 0 0 60px 20px rgba(0,180,255,0.05), inset -30px -15px 50px rgba(0,0,0,0.9), inset 8px 8px 30px rgba(80,160,255,0.06);
@@ -272,14 +280,14 @@ const Bar = ({ label, val, max = 100, color }) => (
 );
 
 const Toggle = ({ on, onClick }) => (
-  <div onClick={onClick} className="w-8 h-[18px] rounded-full cursor-pointer relative flex-shrink-0 transition-colors duration-300" style={{ background: on ? "rgba(0,240,255,0.3)" : "rgba(255,255,255,0.06)" }}>
-    <div className="w-3.5 h-3.5 rounded-full absolute top-[2px] transition-all duration-300" style={{ left: on ? 16 : 2, background: on ? "#00f0ff" : "#444" }} />
+  <div onClick={onClick} className="w-11 h-6 rounded-full cursor-pointer relative flex-shrink-0 transition-colors duration-200" style={{ background: on ? "rgba(92,200,230,0.35)" : "rgba(255,255,255,0.08)" }} role="switch" aria-checked={on}>
+    <div className="w-5 h-5 rounded-full absolute top-[2px] transition-all duration-200" style={{ left: on ? 22 : 2, background: on ? "#5cc8e6" : "#6b7a8d" }} />
   </div>
 );
 
 const Card = ({ children, className = "", accent = null }) => (
   <div className={`rounded-xl p-4 sm:p-5 mb-3 sm:mb-4 border backdrop-blur-sm ${className}`}
-    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", borderLeftWidth: accent ? 3 : 1, borderLeftColor: accent || "rgba(0,240,255,0.06)" }}>
+    style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(255,255,255,0.08)", borderLeftWidth: accent ? 3 : 1, borderLeftColor: accent || "rgba(255,255,255,0.08)" }}>
     {children}
   </div>
 );
@@ -287,9 +295,18 @@ const Card = ({ children, className = "", accent = null }) => (
 const Btn = ({ children, onClick, color = "#00f0ff", full = false, disabled = false, small = false }) => (
   <button onClick={onClick} disabled={disabled}
     className={`font-mono rounded-lg cursor-pointer transition-all active:scale-95 ${full ? 'w-full' : ''} ${small ? 'text-[12px] py-1.5 px-3' : 'text-[14px] py-2.5 px-5'}`}
-    style={{ background: `${color}10`, border: `1px solid ${color}40`, color: disabled ? 'rgba(200,210,230,0.2)' : color, opacity: disabled ? 0.5 : 1 }}>
+    style={{ background: `${color}10`, border: `1px solid ${color}40`, color: disabled ? '#6b7a8d' : color, opacity: disabled ? 0.5 : 1 }}>
     {children}
   </button>
+);
+
+const EmptyState = ({ icon, title, description, action }) => (
+  <div className="text-center py-8 px-4">
+    <div className="text-3xl mb-3 opacity-50">{icon}</div>
+    <div className="text-[15px] font-semibold mb-1" style={{ color: "#e0e8f0" }}>{title}</div>
+    <div className="text-[14px] mb-4 max-w-[260px] mx-auto leading-relaxed" style={{ color: "#8a95a8" }}>{description}</div>
+    {action}
+  </div>
 );
 
 const Input = ({ value, onChange, placeholder, onKeyDown, type = "text" }) => (
@@ -303,7 +320,7 @@ const SubTabs = ({ tabs, active, onChange }) => (
     {tabs.map(t => (
       <button key={t.id} onClick={() => onChange(t.id)}
         className="flex-1 py-2.5 sm:py-3 rounded-lg text-[12px] sm:text-[13px] font-mono tracking-wider transition-all"
-        style={{ background: active === t.id ? `${t.c}12` : "transparent", color: active === t.id ? t.c : "rgba(200,210,230,0.25)", border: active === t.id ? `1px solid ${t.c}30` : "1px solid transparent" }}>
+        style={{ background: active === t.id ? `${t.c}12` : "transparent", color: active === t.id ? t.c : "#6b7a8d", border: active === t.id ? `1px solid ${t.c}30` : "1px solid transparent" }}>
         {t.l}
       </button>
     ))}
@@ -313,7 +330,7 @@ const SubTabs = ({ tabs, active, onChange }) => (
 // ═══════ STAT TILE (for Home) ═══════
 const StatTile = ({ label, value, sub, color, icon }) => (
   <div className="rounded-xl p-3 sm:p-4 border" style={{ background: "rgba(8,12,24,0.85)", borderColor: `${color}15` }}>
-    <div className="text-[12px] sm:text-[13px] font-mono tracking-wider mb-1" style={{ color: `${color}80` }}>{icon} {label}</div>
+    <div className="text-[12px] sm:text-[13px] font-mono tracking-wider mb-1" style={{ color: `${color}cc` }}>{icon} {label}</div>
     <div className="text-2xl sm:text-3xl font-bold font-mono leading-none" style={{ color }}>{value}</div>
     {sub && <div className="text-[12px] sm:text-[13px] font-mono mt-1" style={{ color: "#8a95a8" }}>{sub}</div>}
   </div>
@@ -362,6 +379,7 @@ function App() {
   const [engShowChallenge, setEngShowChallenge] = useState(false);
   const [engChallenge, setEngChallenge] = useState(null);
   const [engIdiom, setEngIdiom] = useState(null);
+  const [confirmAccept, setConfirmAccept] = useState(null);
 
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e) {} }, [s]);
 
@@ -588,7 +606,7 @@ function App() {
     { id: "available", l: `Available (${qAvailable.length})`, c: "#f9ca24" },
     { id: "log", l: `Log (${qAccepted.length})`, c: "#f97316" },
     { id: "board", l: "Board", c: "#00f0ff" },
-    { id: "archive", l: "Archive", c: "rgba(200,210,230,0.3)" },
+    { id: "archive", l: "Archive", c: "#8a95a8" },
   ];
 
   const cyclePred = getCyclePrediction();
@@ -598,7 +616,7 @@ function App() {
       <StarField />
 
       {/* Toast */}
-      {msg && <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 text-xs font-mono px-5 py-2.5 rounded-xl" style={{ background: "rgba(0,240,255,0.12)", border: "1px solid rgba(0,240,255,0.3)", color: "#00f0ff", backdropFilter: "blur(20px)" }}>{msg}</div>}
+      {msg && <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 text-sm font-mono px-6 py-3 rounded-xl" style={{ background: "rgba(15,21,37,0.95)", border: "1px solid rgba(92,200,230,0.25)", color: "#5cc8e6", backdropFilter: "blur(20px)", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} role="status" aria-live="polite">{msg}</div>}
 
       <div className="relative z-10 pb-24">
 
@@ -640,27 +658,30 @@ function App() {
             </div>
           </div>
 
-          {/* Quest Log on Home — shows accepted quests */}
-          {qAccepted.length > 0 && (
-            <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay2">
-              <Card accent="rgba(249,115,22,0.3)">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-[13px] font-mono tracking-wider" style={{ color: "#f97316" }}>📋 QUEST LOG</div>
-                  <div className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,115,22,0.08)", color: "#f97316" }}>{qAccepted.length} active</div>
+          {/* Quest Log on Home — shows accepted quests or prompt */}
+          <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay2">
+            <Card accent="rgba(249,115,22,0.3)">
+              <div className="flex justify-between items-center mb-2">
+                <div className="text-[13px] font-mono tracking-wider" style={{ color: "#f97316" }}>📋 QUEST LOG</div>
+                {qAccepted.length > 0 && <div className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,115,22,0.08)", color: "#f97316" }}>{qAccepted.length} active</div>}
+              </div>
+              {qAccepted.length === 0 ? (
+                <div className="text-center py-4">
+                  <div className="text-[14px] mb-2" style={{ color: "#8a95a8" }}>No active quests. Accept some to get started.</div>
+                  <Btn onClick={() => setTab("quest")} color="#f9ca24" small>Go to Quests</Btn>
                 </div>
-                {qAccepted.map(q => (
-                  <div key={q.id} className="flex items-center gap-2 rounded-lg p-2 mb-1.5" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
-                    <div className="text-sm">{q.i}</div>
-                    <div className="flex-1">
-                      <div className="text-[14px]" style={{ color: "#c0c8d4" }}>{q.n}</div>
-                      <div className="text-[14px] font-mono" style={{ color: "#6b7a8d" }}>{q.t} · +{q.xp}xp</div>
-                    </div>
-                    <Btn onClick={() => completeQuest(q.id)} color="#22c55e" small>✓</Btn>
+              ) : qAccepted.map(q => (
+                <div key={q.id} className="flex items-center gap-2 rounded-lg p-2.5 mb-1.5" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
+                  <div className="text-sm">{q.i}</div>
+                  <div className="flex-1">
+                    <div className="text-[14px]" style={{ color: "#c0c8d4" }}>{q.n}</div>
+                    <div className="text-[14px] font-mono" style={{ color: "#6b7a8d" }}>{q.t} · +{q.xp}xp</div>
                   </div>
-                ))}
-              </Card>
-            </div>
-          )}
+                  <Btn onClick={() => completeQuest(q.id)} color="#22c55e" small>✓</Btn>
+                </div>
+              ))}
+            </Card>
+          </div>
 
           {/* Quick Weight Input */}
           <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay3">
@@ -701,12 +722,12 @@ function App() {
             {questSub === "available" && (<>
               <div className="flex justify-between items-center mb-3">
                 <div className="text-[13px] font-mono tracking-widest" style={{ color: "#f9ca24" }}>⚔ AVAILABLE QUESTS</div>
-                <Btn onClick={resetDailyQuests} color="rgba(200,210,230,0.3)" small>Reset All</Btn>
+                <Btn onClick={resetDailyQuests} color="#8a95a8" small>Reset All</Btn>
               </div>
               {qAvailable.map(q => (
-                <div key={q.id} onClick={() => acceptQuest(q.id)}
+                <div key={q.id} onClick={() => { if (confirmAccept === q.id) { acceptQuest(q.id); setConfirmAccept(null); } else { setConfirmAccept(q.id); } }}
                   className="rounded-xl p-3 mb-2 border cursor-pointer transition-all active:scale-[0.98]"
-                  style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(0,240,255,0.06)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
+                  style={{ background: confirmAccept === q.id ? "rgba(249,202,36,0.04)" : "rgba(8,12,24,0.85)", borderColor: confirmAccept === q.id ? "rgba(249,202,36,0.2)" : "rgba(255,255,255,0.08)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2.5">
                       <span className="text-base">{q.i}</span>
@@ -717,19 +738,19 @@ function App() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[14px] font-mono font-bold" style={{ color: questColors[q.t] }}>+{q.xp}</span>
-                      <span className="text-[14px] font-mono px-2 py-1 rounded" style={{ background: "rgba(249,202,36,0.08)", color: "#f9ca24", border: "1px solid rgba(249,202,36,0.2)" }}>ACCEPT</span>
+                      <span className="text-[14px] font-mono px-2 py-1 rounded" style={{ background: confirmAccept === q.id ? "rgba(249,202,36,0.15)" : "rgba(249,202,36,0.08)", color: "#f9ca24", border: "1px solid rgba(249,202,36,0.2)" }}>{confirmAccept === q.id ? "CONFIRM?" : "ACCEPT"}</span>
                     </div>
                   </div>
                 </div>
               ))}
-              {qAvailable.length === 0 && <div className="text-center py-8 text-[14px]" style={{ color: "#7a8899" }}>All quests accepted or completed!</div>}
+              {qAvailable.length === 0 && <EmptyState icon="🎯" title="All quests active" description="Every quest has been accepted or completed. Reset to start fresh." action={<Btn onClick={resetDailyQuests} color="#f9ca24">Reset Daily Quests</Btn>} />}
             </>)}
 
             {/* QUEST LOG — accepted, waiting to be completed */}
             {questSub === "log" && (<>
               <div className="text-[13px] font-mono tracking-widest mb-1" style={{ color: "#f97316" }}>📋 QUEST LOG</div>
               <div className="text-[14px] mb-3" style={{ color: "#6b7a8d" }}>Accepted quests. Tap ✓ when done.</div>
-              {qAccepted.length === 0 && <div className="text-center py-8 text-[14px]" style={{ color: "#7a8899" }}>No active quests. Accept some from Available!</div>}
+              {qAccepted.length === 0 && <EmptyState icon="📋" title="No active quests" description="Accept quests from the Available tab to start tracking your progress." action={<Btn onClick={() => setQuestSub("available")} color="#f97316">Browse Available</Btn>} />}
               {qAccepted.map(q => (
                 <div key={q.id} className="rounded-xl p-3 mb-2 border"
                   style={{ background: "rgba(8,12,24,0.85)", borderColor: "rgba(249,115,22,0.1)", borderLeftWidth: 3, borderLeftColor: questColors[q.t] }}>
@@ -743,7 +764,7 @@ function App() {
                     </div>
                     <div className="flex gap-1">
                       <Btn onClick={() => completeQuest(q.id)} color="#22c55e" small>✓ Done</Btn>
-                      <Btn onClick={() => dropQuest(q.id)} color="rgba(200,210,230,0.2)" small>✗</Btn>
+                      <Btn onClick={() => dropQuest(q.id)} color="#8a95a8" small>Drop</Btn>
                     </div>
                   </div>
                 </div>
@@ -762,7 +783,7 @@ function App() {
                           <div className="text-[14px] font-mono" style={{ color: "#6b7a8d" }}>+{q.xp}xp · {q.completedAt ? new Date(q.completedAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) : ""}</div>
                         </div>
                       </div>
-                      <Btn onClick={() => archiveQuest(q.id)} color="rgba(200,210,230,0.25)" small>Archive</Btn>
+                      <Btn onClick={() => archiveQuest(q.id)} color="#8a95a8" small>Archive</Btn>
                     </div>
                   </div>
                 ))}
@@ -856,7 +877,7 @@ function App() {
                         <div className="text-[14px] font-mono" style={{ color: "#7a8899" }}>days to next</div>
                       </div>
                       <div className="flex-1 rounded-lg p-2.5 text-center" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.08)" }}>
-                        <div className="text-xl sm:text-2xl font-bold font-mono" style={{ color: cyclePred.daysUntilPMS <= 3 ? "#f97316" : "rgba(200,210,230,0.3)" }}>{cyclePred.daysUntilPMS > 0 ? cyclePred.daysUntilPMS : "NOW"}</div>
+                        <div className="text-xl sm:text-2xl font-bold font-mono" style={{ color: cyclePred.daysUntilPMS <= 3 ? "#f97316" : "#a0aab8" }}>{cyclePred.daysUntilPMS > 0 ? cyclePred.daysUntilPMS : "NOW"}</div>
                         <div className="text-[14px] font-mono" style={{ color: "#7a8899" }}>to PMS</div>
                       </div>
                     </div>
@@ -917,21 +938,21 @@ function App() {
             {/* WORK */}
             {lifeSub === "work" && (<>
               <Card>
-                <div className="text-[13px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>📋 TASKS</div>
+                <div className="text-[13px] font-mono mb-2" style={{ color: "#a78bfa" }}>📋 TASKS</div>
                 <div className="flex gap-2 mb-2">
                   <Input value={uTask} onChange={e => setUTask(e.target.value)} placeholder="New task..." onKeyDown={e => e.key === "Enter" && addUTask()} />
                   <Btn onClick={addUTask} color="#7b2ff7">+</Btn>
                 </div>
                 {universidata.taskAttivi.length === 0 && <div className="text-[14px] italic" style={{ color: "#6b7a8d" }}>No tasks yet.</div>}
                 {universidata.taskAttivi.map(t => (
-                  <div key={t.id} onClick={() => togUTask(t.id)} className="flex items-center gap-2 py-2 cursor-pointer" style={{ borderBottom: "1px solid rgba(0,240,255,0.03)" }}>
-                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 text-[13px]" style={{ border: `1px solid ${t.done ? "#22c55e" : "rgba(200,210,230,0.12)"}`, color: "#22c55e" }}>{t.done && "✓"}</div>
-                    <span className="text-[14px] flex-1" style={{ color: t.done ? "rgba(200,210,230,0.2)" : "#d0d8e4", textDecoration: t.done ? "line-through" : "none" }}>{t.t}</span>
+                  <div key={t.id} onClick={() => togUTask(t.id)} className="flex items-center gap-3 py-2.5 cursor-pointer" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-[14px] transition-colors" style={{ border: `2px solid ${t.done ? "#4ade80" : "rgba(255,255,255,0.12)"}`, background: t.done ? "rgba(74,222,128,0.08)" : "transparent", color: "#4ade80" }}>{t.done && "✓"}</div>
+                    <span className="text-[14px] flex-1" style={{ color: t.done ? "#6b7a8d" : "#d0d8e4", textDecoration: t.done ? "line-through" : "none" }}>{t.t}</span>
                   </div>
                 ))}
               </Card>
               <Card>
-                <div className="text-[13px] font-mono mb-2" style={{ color: "rgba(123,47,247,0.7)" }}>🧠 STRATEGIC NOTES</div>
+                <div className="text-[13px] font-mono mb-2" style={{ color: "#a78bfa" }}>🧠 STRATEGIC NOTES</div>
                 <div className="flex gap-2 mb-2">
                   <Input value={uNote} onChange={e => setUNote(e.target.value)} placeholder="Idea, insight..." onKeyDown={e => e.key === "Enter" && addUNote()} />
                   <Btn onClick={addUNote} color="#7b2ff7">+</Btn>
@@ -956,7 +977,7 @@ function App() {
                 {english.completedToday && <div className="text-center rounded-lg py-2 text-[13px]" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.12)", color: "#22c55e" }}>Done for today ✓</div>}
               </Card>
               <Card>
-                <div className="text-[13px] font-mono mb-3" style={{ color: "rgba(249,115,22,0.6)" }}>{english.focusToday === "business" ? "💼 BUSINESS" : "💬 CONVERSATIONAL"} CHALLENGE</div>
+                <div className="text-[13px] font-mono mb-3" style={{ color: "#fb923c" }}>{english.focusToday === "business" ? "💼 BUSINESS" : "💬 CONVERSATIONAL"} CHALLENGE</div>
                 {!engShowChallenge ? (
                   <Btn onClick={getEngChallenge} color="#f97316" full>{english.completedToday ? "Bonus round" : "Start challenge"}</Btn>
                 ) : engChallenge?.type === "write" ? (
@@ -965,12 +986,12 @@ function App() {
                       <div className="text-[14px] leading-relaxed mb-2" style={{ color: "#c0c8d4" }}>{engChallenge.prompt}</div>
                       <div className="text-[14px] italic" style={{ color: "#fb923c" }}>Tip: {engChallenge.tip}</div>
                     </div>
-                    <textarea value={engResponse} onChange={e => setEngResponse(e.target.value)} placeholder="Write in English..." rows={3}
-                      className="w-full rounded-lg px-3 py-2.5 text-sm font-mono text-white outline-none border resize-none mb-2"
+                    <textarea value={engResponse} onChange={e => setEngResponse(e.target.value)} placeholder="Write in English..." rows={4}
+                      className="w-full rounded-lg px-3 py-3 text-base font-mono text-white outline-none border resize-none mb-2"
                       style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(249,115,22,0.12)" }} />
                     <div className="flex gap-2">
                       <Btn onClick={completeEngChallenge} color="#22c55e" full disabled={!engResponse.trim()}>Submit</Btn>
-                      <Btn onClick={() => { setEngShowChallenge(false); setEngResponse(""); }} color="rgba(200,210,230,0.3)">Skip</Btn>
+                      <Btn onClick={() => { setEngShowChallenge(false); setEngResponse(""); }} color="#8a95a8">Skip</Btn>
                     </div>
                   </div>
                 ) : (
@@ -985,7 +1006,7 @@ function App() {
                 )}
               </Card>
               <Card>
-                <div className="text-[13px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.6)" }}>🎯 IDIOM</div>
+                <div className="text-[13px] font-mono mb-2" style={{ color: "#fb923c" }}>🎯 IDIOM</div>
                 {engIdiom ? (
                   <div className="rounded-lg p-3" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.06)" }}>
                     <div className="text-[13px] font-bold mb-1" style={{ color: "#f97316" }}>"{engIdiom.idiom}"</div>
@@ -996,7 +1017,7 @@ function App() {
                 ) : <Btn onClick={getEngIdiom} color="#f97316" full>Show idiom</Btn>}
               </Card>
               <Card>
-                <div className="text-[13px] font-mono mb-2" style={{ color: "rgba(249,115,22,0.6)" }}>📚 VOCABULARY</div>
+                <div className="text-[13px] font-mono mb-2" style={{ color: "#fb923c" }}>📚 VOCABULARY</div>
                 <div className="flex gap-2 mb-2">
                   <Input value={engVocabWord} onChange={e => setEngVocabWord(e.target.value)} placeholder="New word..." onKeyDown={e => e.key === "Enter" && addEngVocab()} />
                   <Btn onClick={addEngVocab} color="#f97316">+</Btn>
@@ -1048,7 +1069,7 @@ function App() {
                 {showCurQ ? (
                   <div className="rounded-lg p-3" style={{ background: "rgba(123,47,247,0.03)", border: "1px solid rgba(123,47,247,0.08)" }}>
                     <div className="text-[14px] leading-relaxed mb-3" style={{ color: "#c0c8d4" }}>{curQ}</div>
-                    <Btn onClick={() => setShowCurQ(false)} color="rgba(200,210,230,0.3)">Close</Btn>
+                    <Btn onClick={() => setShowCurQ(false)} color="#8a95a8">Close</Btn>
                   </div>
                 ) : <Btn onClick={() => { setCurQ(CURIOSITY_QUESTIONS[Math.floor(Math.random() * CURIOSITY_QUESTIONS.length)]); setShowCurQ(true); }} color="#7b2ff7" full>Eko wants to ask you something...</Btn>}
               </Card>
@@ -1084,7 +1105,7 @@ function App() {
                   <div key={t.id} className="flex items-center gap-2 rounded-xl px-3 py-2.5 mb-1.5" style={{ background: "rgba(8,12,24,0.6)", border: "1px solid rgba(0,240,255,0.04)" }}>
                     <Toggle on={t.on} onClick={() => togSch(t.id)} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-[14px] font-semibold" style={{ color: t.on ? "#e0e8f0" : "rgba(200,210,230,0.2)" }}>{t.n}</div>
+                      <div className="text-[14px] font-semibold" style={{ color: t.on ? "#e0e8f0" : "#6b7a8d" }}>{t.n}</div>
                       <div className="text-[14px] truncate" style={{ color: "#6b7a8d" }}>{t.d}</div>
                     </div>
                     <div className="text-[14px] font-mono" style={{ color: "#7a8899" }}>{t.f}</div>
@@ -1133,14 +1154,14 @@ function App() {
       </div>
 
       {/* ═══ BOTTOM NAV — 4 TABS ═══ */}
-      <div className="fixed bottom-0 left-0 right-0 z-50" style={{ background: "rgba(2,8,16,0.95)", borderTop: "1px solid rgba(0,240,255,0.06)", backdropFilter: "blur(20px)" }}>
+      <div className="fixed bottom-0 left-0 right-0 z-50" style={{ background: "rgba(2,8,16,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}>
         <div className="flex resp-container">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="flex-1 py-4 flex flex-col items-center cursor-pointer transition-all active:scale-95"
-              style={{ color: tab === t.id ? t.c : "rgba(200,210,230,0.15)" }}>
+              style={{ color: tab === t.id ? t.c : "#4a5568" }}>
               <span className="text-xl leading-none">{t.icon}</span>
-              <span className="text-[11px] mt-1.5 font-mono tracking-wide">{t.l}</span>
+              <span className="text-[12px] mt-1.5 font-mono tracking-wide">{t.l}</span>
               {tab === t.id && <div className="w-6 h-0.5 rounded-full mt-1" style={{ background: t.c }} />}
             </button>
           ))}
