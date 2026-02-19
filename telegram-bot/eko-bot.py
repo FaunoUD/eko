@@ -57,12 +57,23 @@ if env_path.exists():
                 os.environ.setdefault(key.strip(), val.strip())
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "YOUR_API_KEY_HERE")
-# Paths work both locally (parent.parent = protocollo-fauno/) and in Docker (/app/)
-BASE_DIR = Path(__file__).parent.parent
+
+# Paths: detect environment (Railway/Docker vs local)
+# In Railway/Docker: eko-bot.py is in /app/, core/ is in /app/core/
+# Locally: eko-bot.py is in telegram-bot/, core/ is in ../core/
+SCRIPT_DIR = Path(__file__).parent
+if (SCRIPT_DIR / "core").exists():
+    # Railway/Docker: everything is in /app/
+    BASE_DIR = SCRIPT_DIR
+else:
+    # Local development: go up one level to protocollo-fauno/
+    BASE_DIR = SCRIPT_DIR.parent
+
 PROFILE_PATH = BASE_DIR / "core" / "fauno-profile.json"
-CHATID_PATH = Path(__file__).parent / "chat_id.txt"
+CHATID_PATH = SCRIPT_DIR / "chat_id.txt"
 MEMORY_DIR = BASE_DIR / "memory" / "telegram"
 DATA_DIR = BASE_DIR / "data"
+logger.info(f"Base directory: {BASE_DIR}")
 
 # Claude client (async)
 claude_client = None

@@ -1,0 +1,7 @@
+[build]
+dockerfilePath = "telegram-bot/Dockerfile"
+
+[deploy]
+startCommand = "python -u eko-bot.py"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
