@@ -122,7 +122,7 @@ const DEFAULT_STATE = {
     xpLog: [],
     personalita: { ironia: 7, tough_love: 6, creativita: 8 },
     questEko: [
-      { id: "EQ001", n: "GitHub Deployment", d: "Platform live on GitHub Pages", s: "ok", o: "auto" },
+      { id: "EQ001", n: "GitHub Deployment", d: "Platform live on GitHub Pages", s: "done", o: "auto", completedAt: "2026-02-17T00:00:00Z" },
       { id: "EQ002", n: "Telegram Mini App", d: "Integrare piattaforma come Web App dentro Telegram", s: "attesa", o: "auto" },
       { id: "EQ003", n: "Design System Sync", d: "Collegare Storybook UniversiData alla piattaforma", s: "attesa", o: "auto" },
       { id: "EQ004", n: "Analytics Engine", d: "Grafici trend peso e stats nel tempo", s: "attesa", o: "auto" },
@@ -160,6 +160,7 @@ const DEFAULT_STATE = {
     { id: "S4", n: "Curiosity", d: "Domanda per conoscerti", f: "13:00", on: false, t: "curiosita" },
     { id: "S5", n: "Cristina Reminder", d: "Hai dedicato tempo a lei?", f: "19:00", on: false, t: "cuore" },
   ],
+  ekoInbox: [],
   log: [{ t: new Date().toLocaleString("it-IT"), x: "Eko v4.0 — Full redesign live.", c: "system" }],
   english: { streak: 0, bestStreak: 0, lastPractice: null, vocabLog: [], completedToday: false, totalCompleted: 0, level: "Beginner Explorer", focusToday: "business" },
   improvements: [
@@ -351,6 +352,7 @@ function App() {
           eko: { ...DEFAULT_STATE.eko, ...parsed.eko, personalita: { ironia: parsed.eko?.personalita?.ironia ?? 7, tough_love: parsed.eko?.personalita?.tough_love ?? 6, creativita: parsed.eko?.personalita?.creativita ?? 8 } },
           quests: (parsed.quests || DEFAULT_STATE.quests).map(q => ({ ...q, status: q.status || (q.done ? "completed" : "available") })),
           questHistory: parsed.questHistory || [],
+          ekoInbox: parsed.ekoInbox || [],
         };
       }
     } catch(e) {}
@@ -376,6 +378,7 @@ function App() {
   const [msg, setMsg] = useState("");
   const [engResponse, setEngResponse] = useState("");
   const [engVocabWord, setEngVocabWord] = useState("");
+  const [inboxReply, setInboxReply] = useState("");
   const [engShowChallenge, setEngShowChallenge] = useState(false);
   const [engChallenge, setEngChallenge] = useState(null);
   const [engIdiom, setEngIdiom] = useState(null);
@@ -461,9 +464,35 @@ function App() {
   const togSch = (id) => setS(p => ({ ...p, scheduler: p.scheduler.map(t => t.id === id ? { ...t, on: !t.on } : t) }));
 
   // ═══ EKO QUEST & PROPOSALS ═══
+  // Lifecycle: attesa → approved → deploying → input → done | rejected (no)
   const eqAct = (id, st) => {
-    setS(p => ({ ...p, eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st } : q) } }));
-    if (st === "ok") { const quest = eko.questEko.find(q => q.id === id); addLog(`Quest "${quest?.n}" approved`, "eko"); notifyBot(`🚀 *Quest Approved*\n\n*${quest?.n}*\n${quest?.d}\n\n_Execute on next Cowork session._`); flash("Approved! Eko notified."); }
+    setS(p => ({
+      ...p,
+      eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st, ...(st === "approved" ? { approvedAt: new Date().toISOString() } : {}), ...(st === "done" ? { completedAt: new Date().toISOString() } : {}) } : q) }
+    }));
+    if (st === "approved") {
+      const quest = eko.questEko.find(q => q.id === id);
+      addLog(`Quest "${quest?.n}" approved — ready for deploy`, "eko");
+      notifyBot(`🚀 *Quest Approved*\n\n*${quest?.n}*\n${quest?.d}\n\n_Open Cowork and run /quest-deploy to execute._`);
+      flash("Approved! Run /quest-deploy in Cowork.");
+    }
+    if (st === "done") {
+      const quest = eko.questEko.find(q => q.id === id);
+      addLog(`Quest "${quest?.n}" completed by Eko`, "eko");
+      flash("Quest completed!");
+    }
+  };
+
+  // ═══ EKO INBOX ═══
+  const dismissInbox = (idx) => {
+    setS(p => ({ ...p, ekoInbox: p.ekoInbox.filter((_, i) => i !== idx) }));
+  };
+  const replyInbox = (idx, reply) => {
+    const item = s.ekoInbox[idx];
+    if (!item) return;
+    setS(p => ({ ...p, ekoInbox: p.ekoInbox.map((m, i) => i === idx ? { ...m, reply, repliedAt: new Date().toISOString() } : m) }));
+    notifyBot(`💬 *Fauno replied to "${item.questId}"*\n\n${reply}`);
+    flash("Reply sent to Eko!");
   };
   const impAct = (id, st) => {
     setS(p => ({ ...p, improvements: p.improvements.map(i => i.id === id ? { ...i, stato: st } : i) }));
@@ -658,6 +687,36 @@ function App() {
             </div>
           </div>
 
+          {/* EKO INBOX — input requests from Eko */}
+          {(s.ekoInbox?.filter(m => !m.reply)?.length > 0 || eko.questEko.filter(q => q.s === "input").length > 0) && (
+            <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay2">
+              <Card accent="#f97316">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#f97316" }} />
+                  <div className="text-[13px] font-mono tracking-wider" style={{ color: "#f97316" }}>✦ EKO NEEDS YOU</div>
+                </div>
+                {eko.questEko.filter(q => q.s === "input").map(q => (
+                  <div key={q.id} className="rounded-lg p-3 mb-2" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.1)" }}>
+                    <div className="text-[14px] font-semibold mb-1" style={{ color: "#e0e8f0" }}>{q.n}</div>
+                    {q.inputMsg && <div className="text-[14px] mb-2" style={{ color: "#c0c8d4" }}>{q.inputMsg}</div>}
+                    <Btn onClick={() => { setTab("quest"); setQuestSub("board"); }} color="#f97316" small>View in Board</Btn>
+                  </div>
+                ))}
+                {(s.ekoInbox || []).filter(m => !m.reply).map((m, i) => (
+                  <div key={i} className="rounded-lg p-3 mb-2" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.1)" }}>
+                    <div className="text-[13px] font-mono mb-1" style={{ color: "#fb923c" }}>{m.questId || "Eko"} · {m.t ? new Date(m.t).toLocaleDateString("it-IT") : ""}</div>
+                    <div className="text-[14px] mb-2" style={{ color: "#c0c8d4" }}>{m.msg}</div>
+                    <div className="flex gap-2">
+                      <Input value={inboxReply} onChange={e => setInboxReply(e.target.value)} placeholder="Reply..." onKeyDown={e => { if (e.key === "Enter") { replyInbox(i, inboxReply); setInboxReply(""); } }} />
+                      <Btn onClick={() => { replyInbox(i, inboxReply); setInboxReply(""); }} color="#f97316" small>Send</Btn>
+                      <Btn onClick={() => dismissInbox(i)} color="#8a95a8" small>Dismiss</Btn>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            </div>
+          )}
+
           {/* Quest Log on Home — shows accepted quests or prompt */}
           <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay2">
             <Card accent="rgba(249,115,22,0.3)">
@@ -792,30 +851,104 @@ function App() {
 
             {/* EKO BOARD */}
             {questSub === "board" && (<>
-              <div className="text-[13px] font-mono tracking-widest mb-3" style={{ color: "#00f0ff" }}>✦ EKO QUEST BOARD</div>
-              <div className="text-[14px] mb-3 leading-relaxed" style={{ color: "#7a8899" }}>These are system quests that Eko proposes to improve the platform. Approve them and Eko will execute on the next Cowork session.</div>
-              {eko.questEko.filter(q => q.s === "attesa").map(q => (
-                <Card key={q.id} accent="#f9ca24" className="!p-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
-                        <span className="text-[14px] font-mono px-1 rounded" style={{ background: "rgba(249,202,36,0.08)", color: "#f9ca24" }}>PENDING</span>
-                      </div>
-                      <div className="text-[14px] mt-1" style={{ color: "#7a8899" }}>{q.d}</div>
+              <div className="text-[13px] font-mono tracking-widest mb-1" style={{ color: "#00f0ff" }}>✦ EKO QUEST BOARD</div>
+              <div className="text-[14px] mb-4 leading-relaxed" style={{ color: "#7a8899" }}>Approve quests here. Then open Cowork and run <span style={{ color: "#5cc8e6" }}>/quest-deploy</span> to execute.</div>
+
+              {/* INPUT NEEDED — highest priority */}
+              {eko.questEko.filter(q => q.s === "input").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mb-2 flex items-center gap-2" style={{ color: "#f97316" }}>
+                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#f97316" }} />NEEDS YOUR INPUT
+                </div>
+                {eko.questEko.filter(q => q.s === "input").map(q => (
+                  <Card key={q.id} accent="#f97316" className="!p-3">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                      <span className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
+                      <span className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,115,22,0.1)", color: "#fb923c" }}>INPUT</span>
                     </div>
-                    <div className="flex gap-1 ml-2"><Btn onClick={() => eqAct(q.id, "ok")} color="#22c55e" small>✓</Btn><Btn onClick={() => eqAct(q.id, "no")} color="#ff3366" small>✗</Btn></div>
-                  </div>
-                </Card>
-              ))}
-              {eko.questEko.filter(q => q.s === "ok").length > 0 && <>
-                <div className="text-[14px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#4ade80" }}>APPROVED</div>
-                {eko.questEko.filter(q => q.s === "ok").map(q => (
-                  <div key={q.id} className="rounded-lg p-2 mb-1.5" style={{ background: "rgba(34,197,94,0.03)", borderLeft: "2px solid rgba(34,197,94,0.2)" }}>
-                    <div className="text-[13px]" style={{ color: "#a0aab8" }}>{q.n}</div>
+                    <div className="text-[14px]" style={{ color: "#7a8899" }}>{q.d}</div>
+                    {q.inputMsg && <div className="mt-2 rounded-lg p-2.5" style={{ background: "rgba(249,115,22,0.04)", border: "1px solid rgba(249,115,22,0.12)" }}>
+                      <div className="text-[13px] font-mono mb-1" style={{ color: "#fb923c" }}>Eko asks:</div>
+                      <div className="text-[14px]" style={{ color: "#c0c8d4" }}>{q.inputMsg}</div>
+                    </div>}
+                  </Card>
+                ))}
+              </>}
+
+              {/* DEPLOYING — in progress */}
+              {eko.questEko.filter(q => q.s === "deploying").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mb-2 flex items-center gap-2" style={{ color: "#5cc8e6" }}>
+                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#5cc8e6" }} />DEPLOYING
+                </div>
+                {eko.questEko.filter(q => q.s === "deploying").map(q => (
+                  <div key={q.id} className="rounded-xl p-3 mb-2 border" style={{ background: "rgba(92,200,230,0.02)", borderColor: "rgba(92,200,230,0.12)" }}>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
+                      <span className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(92,200,230,0.08)", color: "#5cc8e6" }}>IN PROGRESS</span>
+                    </div>
+                    <div className="text-[14px] mt-1" style={{ color: "#7a8899" }}>{q.d}</div>
                   </div>
                 ))}
               </>}
+
+              {/* APPROVED — ready for deploy */}
+              {eko.questEko.filter(q => q.s === "approved").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mb-2 flex items-center gap-2" style={{ color: "#4ade80" }}>
+                  <span className="w-2 h-2 rounded-full" style={{ background: "#4ade80" }} />APPROVED — READY
+                </div>
+                {eko.questEko.filter(q => q.s === "approved").map(q => (
+                  <div key={q.id} className="rounded-xl p-3 mb-2 border" style={{ background: "rgba(34,197,94,0.02)", borderColor: "rgba(34,197,94,0.12)" }}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</div>
+                        <div className="text-[14px] mt-0.5" style={{ color: "#7a8899" }}>{q.d}</div>
+                      </div>
+                      <span className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(34,197,94,0.08)", color: "#4ade80" }}>QUEUED</span>
+                    </div>
+                  </div>
+                ))}
+              </>}
+
+              {/* PENDING — waiting for approval */}
+              {eko.questEko.filter(q => q.s === "attesa").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#f9ca24" }}>PENDING APPROVAL</div>
+                {eko.questEko.filter(q => q.s === "attesa").map(q => (
+                  <Card key={q.id} accent="#f9ca24" className="!p-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</div>
+                        <div className="text-[14px] mt-1" style={{ color: "#7a8899" }}>{q.d}</div>
+                      </div>
+                      <div className="flex gap-1 ml-2"><Btn onClick={() => eqAct(q.id, "approved")} color="#22c55e" small>Approve</Btn><Btn onClick={() => eqAct(q.id, "no")} color="#ff3366" small>✗</Btn></div>
+                    </div>
+                  </Card>
+                ))}
+              </>}
+
+              {/* DONE */}
+              {eko.questEko.filter(q => q.s === "done").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#8a95a8" }}>COMPLETED</div>
+                {eko.questEko.filter(q => q.s === "done").map(q => (
+                  <div key={q.id} className="rounded-lg p-2.5 mb-1.5" style={{ background: "rgba(255,255,255,0.01)", borderLeft: "2px solid rgba(138,149,168,0.2)" }}>
+                    <div className="flex justify-between items-center">
+                      <div className="text-[14px]" style={{ color: "#a0aab8" }}>✅ {q.n}</div>
+                      {q.completedAt && <div className="text-[13px] font-mono" style={{ color: "#6b7a8d" }}>{new Date(q.completedAt).toLocaleDateString("it-IT")}</div>}
+                    </div>
+                  </div>
+                ))}
+              </>}
+
+              {/* REJECTED */}
+              {eko.questEko.filter(q => q.s === "no").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#6b7a8d" }}>REJECTED</div>
+                {eko.questEko.filter(q => q.s === "no").map(q => (
+                  <div key={q.id} className="rounded-lg p-2 mb-1.5 flex justify-between items-center" style={{ borderLeft: "2px solid rgba(107,122,141,0.15)" }}>
+                    <div className="text-[14px]" style={{ color: "#6b7a8d", textDecoration: "line-through" }}>{q.n}</div>
+                    <Btn onClick={() => eqAct(q.id, "attesa")} color="#8a95a8" small>Reopen</Btn>
+                  </div>
+                ))}
+              </>}
+
+              {eko.questEko.length === 0 && <EmptyState icon="✦" title="No Eko Quests" description="Eko will propose system quests during Cowork sessions." />}
             </>)}
 
             {/* ARCHIVE — sorted by completedAt (newest first) */}
