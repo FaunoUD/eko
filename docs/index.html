@@ -478,8 +478,15 @@ function App() {
     }
     if (st === "done") {
       const quest = eko.questEko.find(q => q.id === id);
-      addLog(`Quest "${quest?.n}" completed by Eko`, "eko");
+      addLog(`Quest "${quest?.n}" — confirmed success ✓`, "eko");
+      notifyBot(`✅ *Quest Confirmed*\n\n*${quest?.n}*\n_Fauno confirmed: SUCCESS_`);
       flash("Quest completed!");
+    }
+    if (st === "failed") {
+      const quest = eko.questEko.find(q => q.id === id);
+      addLog(`Quest "${quest?.n}" — marked as failed ✗`, "eko");
+      notifyBot(`❌ *Quest Failed*\n\n*${quest?.n}*\n_Fauno marked as FAILED. Retry needed._`);
+      flash("Marked as failed. Can retry.");
     }
   };
 
@@ -687,14 +694,27 @@ function App() {
             </div>
           </div>
 
-          {/* EKO INBOX — input requests from Eko */}
-          {(s.ekoInbox?.filter(m => !m.reply)?.length > 0 || eko.questEko.filter(q => q.s === "input").length > 0) && (
+          {/* EKO INBOX — input requests, reviews from Eko */}
+          {(s.ekoInbox?.filter(m => !m.reply)?.length > 0 || eko.questEko.filter(q => q.s === "input" || q.s === "review").length > 0) && (
             <div className="px-4 sm:px-6 lg:px-8 resp-container animate-fade-delay2">
               <Card accent="#f97316">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#f97316" }} />
                   <div className="text-[13px] font-mono tracking-wider" style={{ color: "#f97316" }}>✦ EKO NEEDS YOU</div>
                 </div>
+                {eko.questEko.filter(q => q.s === "review").map(q => (
+                  <div key={q.id} className="rounded-lg p-3 mb-2" style={{ background: "rgba(249,202,36,0.03)", border: "1px solid rgba(249,202,36,0.12)" }}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
+                      <span className="text-[12px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,202,36,0.1)", color: "#f9ca24" }}>REVIEW</span>
+                    </div>
+                    {q.deployNote && <div className="text-[14px] mb-2" style={{ color: "#c0c8d4" }}>{q.deployNote}</div>}
+                    <div className="flex gap-2">
+                      <Btn onClick={() => eqAct(q.id, "done")} color="#22c55e" small>✓ Success</Btn>
+                      <Btn onClick={() => eqAct(q.id, "failed")} color="#ff3366" small>✗ Failed</Btn>
+                    </div>
+                  </div>
+                ))}
                 {eko.questEko.filter(q => q.s === "input").map(q => (
                   <div key={q.id} className="rounded-lg p-3 mb-2" style={{ background: "rgba(249,115,22,0.03)", border: "1px solid rgba(249,115,22,0.1)" }}>
                     <div className="text-[14px] font-semibold mb-1" style={{ color: "#e0e8f0" }}>{q.n}</div>
@@ -852,7 +872,25 @@ function App() {
             {/* EKO BOARD */}
             {questSub === "board" && (<>
               <div className="text-[13px] font-mono tracking-widest mb-1" style={{ color: "#00f0ff" }}>✦ EKO QUEST BOARD</div>
-              <div className="text-[14px] mb-4 leading-relaxed" style={{ color: "#7a8899" }}>Approve quests here. Then open Cowork and run <span style={{ color: "#5cc8e6" }}>/quest-deploy</span> to execute.</div>
+
+              {/* DEPLOY INSTRUCTION BANNER — shown when approved quests exist */}
+              {eko.questEko.filter(q => q.s === "approved").length > 0 && (
+                <div className="rounded-xl p-3 mb-4 border" style={{ background: "rgba(92,200,230,0.03)", borderColor: "rgba(92,200,230,0.15)" }}>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-base">🚀</span>
+                    <span className="text-[14px] font-semibold" style={{ color: "#5cc8e6" }}>{eko.questEko.filter(q => q.s === "approved").length} quest{eko.questEko.filter(q => q.s === "approved").length > 1 ? "s" : ""} ready to deploy</span>
+                  </div>
+                  <div className="text-[14px] leading-relaxed" style={{ color: "#a0aab8" }}>
+                    Open <span style={{ color: "#5cc8e6" }}>Cowork</span> and run <span className="font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(92,200,230,0.08)", color: "#5cc8e6", border: "1px solid rgba(92,200,230,0.15)" }}>/quest-deploy</span> to start execution.
+                  </div>
+                  <div className="text-[13px] mt-2" style={{ color: "#6b7a8d" }}>Eko will work on them automatically. You'll review the result here before confirming.</div>
+                </div>
+              )}
+
+              {/* NO APPROVED — show general instructions */}
+              {eko.questEko.filter(q => q.s === "approved").length === 0 && (
+                <div className="text-[14px] mb-4 leading-relaxed" style={{ color: "#7a8899" }}>Approve quests below. Then open Cowork → <span className="font-mono" style={{ color: "#5cc8e6" }}>/quest-deploy</span></div>
+              )}
 
               {/* INPUT NEEDED — highest priority */}
               {eko.questEko.filter(q => q.s === "input").length > 0 && <>
@@ -877,7 +915,7 @@ function App() {
               {/* DEPLOYING — in progress */}
               {eko.questEko.filter(q => q.s === "deploying").length > 0 && <>
                 <div className="text-[13px] font-mono tracking-widest mb-2 flex items-center gap-2" style={{ color: "#5cc8e6" }}>
-                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#5cc8e6" }} />DEPLOYING
+                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#5cc8e6" }} />EKO IS WORKING
                 </div>
                 {eko.questEko.filter(q => q.s === "deploying").map(q => (
                   <div key={q.id} className="rounded-xl p-3 mb-2 border" style={{ background: "rgba(92,200,230,0.02)", borderColor: "rgba(92,200,230,0.12)" }}>
@@ -887,6 +925,30 @@ function App() {
                     </div>
                     <div className="text-[14px] mt-1" style={{ color: "#7a8899" }}>{q.d}</div>
                   </div>
+                ))}
+              </>}
+
+              {/* REVIEW — Eko finished, needs manual confirmation */}
+              {eko.questEko.filter(q => q.s === "review").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mb-2 flex items-center gap-2" style={{ color: "#f9ca24" }}>
+                  <span className="w-2 h-2 rounded-full animate-pulse-soft" style={{ background: "#f9ca24" }} />REVIEW NEEDED
+                </div>
+                {eko.questEko.filter(q => q.s === "review").map(q => (
+                  <Card key={q.id} accent="#f9ca24" className="!p-3">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                      <span className="text-[14px] font-semibold" style={{ color: "#e0e8f0" }}>{q.n}</span>
+                      <span className="text-[14px] font-mono px-1.5 py-0.5 rounded" style={{ background: "rgba(249,202,36,0.1)", color: "#f9ca24" }}>REVIEW</span>
+                    </div>
+                    <div className="text-[14px] mb-1" style={{ color: "#7a8899" }}>{q.d}</div>
+                    {q.deployNote && <div className="rounded-lg p-2.5 mb-2" style={{ background: "rgba(249,202,36,0.03)", border: "1px solid rgba(249,202,36,0.1)" }}>
+                      <div className="text-[13px] font-mono mb-1" style={{ color: "#f9ca24" }}>Eko's report:</div>
+                      <div className="text-[14px]" style={{ color: "#c0c8d4" }}>{q.deployNote}</div>
+                    </div>}
+                    <div className="flex gap-2">
+                      <Btn onClick={() => eqAct(q.id, "done")} color="#22c55e" full>✓ Success</Btn>
+                      <Btn onClick={() => eqAct(q.id, "failed")} color="#ff3366">✗ Failed</Btn>
+                    </div>
+                  </Card>
                 ))}
               </>}
 
@@ -937,7 +999,23 @@ function App() {
                 ))}
               </>}
 
-              {/* REJECTED */}
+              {/* FAILED — can retry */}
+              {eko.questEko.filter(q => q.s === "failed").length > 0 && <>
+                <div className="text-[13px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#ff3366" }}>FAILED</div>
+                {eko.questEko.filter(q => q.s === "failed").map(q => (
+                  <div key={q.id} className="rounded-xl p-3 mb-2 border" style={{ background: "rgba(255,51,102,0.02)", borderColor: "rgba(255,51,102,0.1)" }}>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-[14px]" style={{ color: "#f87171" }}>✗ {q.n}</div>
+                        {q.deployNote && <div className="text-[13px] mt-0.5" style={{ color: "#7a8899" }}>{q.deployNote}</div>}
+                      </div>
+                      <Btn onClick={() => eqAct(q.id, "approved")} color="#f9ca24" small>Retry</Btn>
+                    </div>
+                  </div>
+                ))}
+              </>}
+
+              {/* REJECTED — not wanted */}
               {eko.questEko.filter(q => q.s === "no").length > 0 && <>
                 <div className="text-[13px] font-mono tracking-widest mt-4 mb-2" style={{ color: "#6b7a8d" }}>REJECTED</div>
                 {eko.questEko.filter(q => q.s === "no").map(q => (
