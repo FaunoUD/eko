@@ -1,0 +1,29 @@
+# === SECRETS — never push these ===
+.env
+*.env
+telegram-bot/.env
+
+# === Local/temporary files ===
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+
+# === Memory & data (generated at runtime) ===
+memory/telegram/**/*.jsonl
+memory/cowork/**/*.jsonl
+memory/digest/**/*.md
+data/peso-log.json
+data/quest-log.json
+data/english-log.json
+data/xp-log.json
+
+# === Keep directory structure ===
+!memory/telegram/.gitkeep
+!memory/cowork/.gitkeep
+!memory/digest/.gitkeep
+!data/.gitkeep
+
+# === Chat ID (contains personal Telegram ID) ===
+telegram-bot/chat_id.txt

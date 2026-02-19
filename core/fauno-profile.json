@@ -1,0 +1,217 @@
+{
+  "protocollo": "Fauno",
+  "versione": "2.0",
+  "data_creazione": "2026-02-18",
+  "ultimo_aggiornamento": "2026-02-18",
+  "piattaforma": "Eko",
+  "identita": {
+    "nome_reale": "Silviu",
+    "nome_codice": "Fauno",
+    "eta": 32,
+    "ruolo": "COO & Co-Fondatore",
+    "azienda": "UniversiData",
+    "gruppo": "Ingenium Group",
+    "settore": "EdTech + AI",
+    "filosofia": "Osservare e Creare",
+    "citazione": "All we have to decide is what to do with the time that is given us.",
+    "skills_professionali": [
+      "UI/UX Design Senior",
+      "Product Management",
+      "AI Strategy"
+    ],
+    "nota_eko": "Fauno chiederà spesso pareri da UI/UX designer senior. Skill sempre attiva.",
+    "nota_programmazione": "Fauno NON è un programmatore, ma lavora con sviluppatori bravissimi che usano Claude Code. Stanno puntando su di loro il futuro dell'azienda."
+  },
+  "cristina": {
+    "nome": "Cristina",
+    "relazione": "Partner di vita e di lavoro",
+    "anni_insieme": 13,
+    "ruolo_aziendale": "Co-fondatrice UniversiData",
+    "importanza": "PRIMA DI TUTTO. Prima dell'azienda, prima del protocollo.",
+    "note": "Cresciuti insieme, passati tra le intemperie della vita mano nella mano. Lavoro e vita privata mischiati.",
+    "modulo_cura": {
+      "attivo": true,
+      "obiettivi": [
+        "Assicurarsi che Fauno la ascolti attivamente",
+        "Ricordare date importanti",
+        "Promuovere tempo di qualità fuori dal lavoro",
+        "Separare momenti coppia da momenti lavoro",
+        "Monitorare equilibrio vita-lavoro nella relazione"
+      ],
+      "date_importanti": [],
+      "note_relazione": [],
+      "ultimo_gesto_cura": null
+    }
+  },
+  "universidata": {
+    "nome": "UniversiData",
+    "gruppo": "Ingenium Group",
+    "settore": "EdTech + AI",
+    "descrizione": "Centro R&D AI focalizzato su education. Ecosistema B2B per grandi imprese. Gestisce scuole internazionali in Italia.",
+    "co_fondatori": [
+      "Silviu (Fauno) - COO",
+      "Cristina - Co-fondatrice"
+    ],
+    "team_dev": {
+      "nota": "Sviluppatori bravissimi che usano Claude Code. Fauno sta puntando il futuro dell'azienda su di loro.",
+      "strumenti": [
+        "Claude Code"
+      ],
+      "strategia": "AI-first development"
+    },
+    "tech_stack": {
+      "frontend_framework": "Tailwind CSS",
+      "nota": "Fauno condividerà file Figma, link e accesso Storybook. RICORDAGLIELO.",
+      "figma": null,
+      "storybook": null
+    },
+    "priorita_attuali": [],
+    "sfide": [
+      "Sovraccarico mentale",
+      "Poche risorse umane per la mole di lavoro",
+      "Fauno deve diventare frontman"
+    ],
+    "modulo_base": {
+      "task_aziendali": [],
+      "scadenze": [],
+      "note_strategiche": []
+    }
+  },
+  "sogni": {
+    "a_frame": {
+      "descrizione": "A-frame house nella natura — il rifugio definitivo",
+      "priorita": "febbraio-2026",
+      "stato": "da pianificare",
+      "nota": "Fauno AMA la natura. L'obiettivo è fuggire dal caos e avere un posto nel verde."
+    }
+  },
+  "corpo": {
+    "altezza_cm": 178,
+    "peso_attuale_kg": 85,
+    "peso_obiettivo_kg": 70,
+    "peso_benchmark_magro_kg": "70-73",
+    "deadline_obiettivo": "2026-04-18",
+    "storia_peso": {
+      "massimo": 95,
+      "minimo_raggiunto": 78,
+      "metodo_efficace": "Intermittent Fasting",
+      "contesto_minimo": "Matrimonio di Pamela"
+    }
+  },
+  "alimentazione": {
+    "metodo_preferito": "Intermittent Fasting",
+    "cibi_preferiti": [
+      "yogurt",
+      "cereali e derivati",
+      "uova",
+      "formaggi (feta, italiani, romeni)",
+      "carne",
+      "riso bianco",
+      "ramen",
+      "torte salate",
+      "verdure crude",
+      "frutta"
+    ]
+  },
+  "salute_mentale": {
+    "dipendenze": {
+      "thc": {
+        "stato": "attiva - da riformare",
+        "dispositivo": "vape pen (weedorizers.com)",
+        "effetto": "attivazione cerebrale, notti produttive",
+        "obiettivo": "da abuso a uso medicinale/reward"
+      },
+      "nicotina": {
+        "stato": "in fase di cessazione"
+      }
+    },
+    "pattern_sonno": "notturno"
+  },
+  "denti": {
+    "problema": "3 frontali storti da sostituire, 4 assenti",
+    "deadline": "prima del 2026-04-18"
+  },
+  "english": {
+    "modulo": "English Literacy",
+    "attivo": true,
+    "livello_attuale": "Beginner Explorer",
+    "focus": [
+      "Business English",
+      "Conversational fluency"
+    ],
+    "metodo": "Daily challenges alternating business/conversational",
+    "obiettivo": "Become comfortable writing and speaking in English for work and life",
+    "nota": "Fauno capisce bene l'inglese ma ha bisogno di pratica attiva — writing, vocabulary building, idioms",
+    "streak": 0,
+    "total_completed": 0,
+    "vocab_log": []
+  },
+  "eko": {
+    "livello": 1,
+    "xp": 0,
+    "xp_per_livello": 100,
+    "titolo": "Eco Nascente",
+    "abilita_sbloccate": [
+      "memoria_base",
+      "curiosita",
+      "pianificazione",
+      "ui_ux_review"
+    ],
+    "log_xp": [],
+    "personalita": {
+      "ironia": 7,
+      "formalita": 3,
+      "creativita": 8,
+      "tough_love": 6,
+      "verbosita": 4,
+      "empatia": 8,
+      "proattivita": 7,
+      "filosofico": 5
+    },
+    "memoria_permanente": [
+      "Fauno chiede spesso pareri UI/UX senior - skill sempre attiva",
+      "La piattaforma deve usare Tailwind CSS (framework di UniversiData)",
+      "Fauno condividerà Figma + Storybook - RICORDARGLIELO",
+      "Cristina è la priorità numero uno, prima dell'azienda",
+      "Auto-save per modifiche leggere, manual-save per modifiche strutturali",
+      "Fauno AMA la natura — obiettivo A-frame house per rifugiarsi",
+      "Estetica piattaforma: space theme + cyberpunk (Cyberpunk 2077)",
+      "Architettura scalabile: MAI rompere ciò che funziona",
+      "Fauno NON è programmatore, ma lavora con dev bravissimi che usano Claude Code",
+      "Su Telegram: fare domande quotidiane su visione aziendale per migliorare prospettiva",
+      "English Literacy module attivo: daily challenges (business + conversational), vocab log, idioms. Fauno vuole migliorare urgentemente",
+      "FUTURO: ElevenLabs voice integration — Fauno vuole che Eko possa parlare con voce su Telegram"
+    ]
+  },
+  "telegram": {
+    "bot_token": "8579718161:AAEruE9Owq7cURcius6K6DTcADaDkAKOD2o",
+    "bot_username": "fauno_eko_bot",
+    "ai_engine": "claude-haiku-4-5",
+    "ai_model_note": "Haiku for speed + low cost on Telegram. ~$0.001 per message.",
+    "chat_id": null,
+    "configurato": false,
+    "mini_app_url": null,
+    "domande_extra": {
+      "visione_aziendale": true,
+      "nota": "Chiedere quotidianamente a Fauno domande sulla visione di UniversiData per affinare sia la sua prospettiva che quella di Eko"
+    }
+  },
+  "preferenze_piattaforma": {
+    "nome_piattaforma": "Eko",
+    "tema": "space + cyberpunk",
+    "framework_css": "Tailwind CSS",
+    "auto_save": [
+      "peso",
+      "quest_completate",
+      "personalita_slider",
+      "toggle_scheduler"
+    ],
+    "manual_save": [
+      "profilo_identita",
+      "date_importanti",
+      "note_strategiche",
+      "configurazione_sistema"
+    ],
+    "design_system": "Da collegare con Storybook UniversiData"
+  }
+}

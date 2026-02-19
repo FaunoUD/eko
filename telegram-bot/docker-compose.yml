@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  eko-bot:
+    build: .
+    container_name: eko-telegram-bot
+    restart: unless-stopped
+    volumes:
+      - ../core:/app/core
+      - ../memory:/app/memory
+      - ../data:/app/data
+      - ./chat_id.txt:/app/chat_id.txt
+    environment:
+      - TZ=Europe/Rome
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

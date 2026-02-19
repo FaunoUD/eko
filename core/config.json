@@ -1,0 +1,31 @@
+{
+  "versione": "3.0",
+  "nome_piattaforma": "Eko",
+  "struttura": "NAS-first",
+  "paths": {
+    "profile": "core/fauno-profile.json",
+    "state": "core/state.json",
+    "dashboard": "platform/protocollo-fauno.jsx",
+    "telegram_bot": "telegram-bot/eko-bot.py",
+    "memory_telegram": "memory/telegram/",
+    "memory_cowork": "memory/cowork/",
+    "memory_digest": "memory/digest/",
+    "data": "data/"
+  },
+  "telegram": {
+    "bot_token_env": "BOT_TOKEN is in eko-bot.py",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "synology": {
+    "shared_folder": "/volume1/eko",
+    "docker_compose": "telegram-bot/docker-compose.yml",
+    "nota": "Map this folder as network drive on Windows (e.g. Z:\\eko)"
+  },
+  "futuro": {
+    "elevenlabs": "Voice integration for Telegram — Eko speaks",
+    "telegram_mini_app": "Dashboard as Telegram Web App",
+    "cristina_calendar": "Google Calendar sync for important dates",
+    "weight_chart": "Trend line + projection to 70kg"
+  }
+}
