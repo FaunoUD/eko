@@ -421,6 +421,23 @@ async def cmd_idiom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+DASHBOARD_URL = "https://faunoud.github.io/eko/"
+
+async def cmd_protocol(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler /protocol — Link to the Protocollo: Fauno dashboard."""
+    giorni = giorni_rimasti()
+    await update.message.reply_text(
+        f"🦌 *Protocollo: Fauno*\n"
+        f"━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"⏱ *{giorni} days* to deadline\n\n"
+        f"🌐 [Open Dashboard]({DASHBOARD_URL})\n\n"
+        f"_Works on mobile, desktop, anywhere._\n"
+        f"_Your data saves locally on the device._",
+        parse_mode="Markdown",
+        disable_web_page_preview=True,
+    )
+
+
 def build_system_prompt():
     """Build Eko's system prompt with profile context."""
     profile = load_profile()
@@ -467,7 +484,8 @@ REGOLE DI COMUNICAZIONE:
 
 PIATTAFORMA EKO:
 - GitHub repo: https://github.com/FaunoUD/eko
-- Dashboard "Protocollo: Fauno" è un file JSX in platform/protocollo-fauno.jsx
+- Dashboard LIVE: https://faunoud.github.io/eko/ (funziona su mobile e desktop)
+- Dashboard source: platform/protocollo-fauno.jsx e platform/index.html
 - Il profilo di Fauno è in core/fauno-profile.json
 - Tu (Telegram) sei in telegram-bot/eko-bot.py
 - Docs: docs/PIANO-OPERATIVO.md, docs/SETUP.md, docs/CONTRATTO-EKO-FAUNO.pdf
@@ -699,6 +717,7 @@ async def post_init(application: Application):
         BotCommand("motivazione", "Boost motivazionale"),
         BotCommand("english", "Daily English challenge"),
         BotCommand("idiom", "English idiom of the day"),
+        BotCommand("protocol", "Open Protocollo: Fauno dashboard"),
         BotCommand("help", "Lista comandi"),
     ]
     await application.bot.set_my_commands(commands)
@@ -752,6 +771,7 @@ def main():
     app.add_handler(CommandHandler("motivazione", cmd_motivazione))
     app.add_handler(CommandHandler("english", cmd_english))
     app.add_handler(CommandHandler("idiom", cmd_idiom))
+    app.add_handler(CommandHandler("protocol", cmd_protocol))
 
     # Text handler (catch-all)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
