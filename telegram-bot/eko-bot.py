@@ -24,6 +24,8 @@ import sys
 import random
 import logging
 import asyncio
+import urllib.request
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
@@ -83,9 +85,148 @@ if ANTHROPIC_API_KEY and ANTHROPIC_API_KEY != "YOUR_API_KEY_HERE":
 else:
     logger.warning("No ANTHROPIC_API_KEY — bot will use fallback responses")
 
+# GitHub integration
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO = "FaunoUD/eko"
+DEPLOY_LOG_DIR = DATA_DIR / "deploy-logs"
+
 # Conversation memory (last N messages per chat, resets on bot restart)
 CHAT_HISTORY = {}
 MAX_HISTORY = 20
+
+# ═══════════════════════════════════
+# QUEST ENGINE
+# ═══════════════════════════════════
+
+QUEST_FILE = DATA_DIR / "quest-board.json"
+
+def load_quest_board():
+    """Load quest board from disk."""
+    if QUEST_FILE.exists():
+        with open(QUEST_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"quests": [], "version": 1}
+
+def save_quest_board(board):
+    """Save quest board to disk."""
+    QUEST_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(QUEST_FILE, "w", encoding="utf-8") as f:
+        json.dump(board, f, indent=2, ensure_ascii=False)
+
+def add_quest(title, description, impact="medio", source="eko"):
+    """Add a new quest to the board."""
+    board = load_quest_board()
+    quest_id = f"Q{len(board['quests']) + 1:03d}"
+    quest = {
+        "id": quest_id,
+        "title": title,
+        "description": description,
+        "impact": impact,
+        "status": "proposed",  # proposed → approved → in_progress → deployed → failed
+        "source": source,
+        "created": datetime.now().isoformat(),
+        "approved_at": None,
+        "deployed_at": None,
+        "github_issue": None,
+    }
+    board["quests"].append(quest)
+    save_quest_board(board)
+    return quest
+
+def approve_quest(quest_id):
+    """Approve a quest and create a GitHub Issue for it."""
+    board = load_quest_board()
+    quest = next((q for q in board["quests"] if q["id"] == quest_id), None)
+    if not quest:
+        return None
+    quest["status"] = "approved"
+    quest["approved_at"] = datetime.now().isoformat()
+
+    # Create GitHub Issue
+    issue_url = create_github_issue(quest)
+    if issue_url:
+        quest["github_issue"] = issue_url
+
+    save_quest_board(board)
+    return quest
+
+def create_github_issue(quest):
+    """Create a GitHub Issue for an approved quest."""
+    if not GITHUB_TOKEN:
+        logger.warning("No GITHUB_TOKEN — cannot create issue")
+        return None
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/issues"
+    data = json.dumps({
+        "title": f"[Quest {quest['id']}] {quest['title']}",
+        "body": (
+            f"## Quest: {quest['title']}\n\n"
+            f"**Impact:** {quest['impact']}\n"
+            f"**Source:** {quest['source']}\n"
+            f"**Approved:** {quest['approved_at']}\n\n"
+            f"### Description\n{quest['description']}\n\n"
+            f"### Rules\n"
+            f"- [ ] Additive change only — do NOT break existing features\n"
+            f"- [ ] Test before deploying\n"
+            f"- [ ] Update quest status when done\n\n"
+            f"---\n*Created automatically by Eko Quest Engine*"
+        ),
+        "labels": ["quest-approved"],
+    }).encode()
+
+    req = urllib.request.Request(url, data=data, method="POST")
+    req.add_header("Authorization", f"token {GITHUB_TOKEN}")
+    req.add_header("Accept", "application/vnd.github+json")
+    req.add_header("Content-Type", "application/json")
+
+    try:
+        resp = urllib.request.urlopen(req)
+        result = json.loads(resp.read())
+        logger.info(f"GitHub Issue created: {result.get('html_url')}")
+        return result.get("html_url")
+    except Exception as e:
+        logger.error(f"GitHub Issue creation failed: {e}")
+        return None
+
+
+def save_deploy_log(quest_id, short_summary, detailed_log):
+    """Save a deploy log — short for Telegram, detailed for when Fauno asks."""
+    DEPLOY_LOG_DIR.mkdir(parents=True, exist_ok=True)
+    log_entry = {
+        "quest_id": quest_id,
+        "timestamp": datetime.now().isoformat(),
+        "short": short_summary,
+        "detailed": detailed_log,
+    }
+    log_file = DEPLOY_LOG_DIR / f"{quest_id}.json"
+    with open(log_file, "w", encoding="utf-8") as f:
+        json.dump(log_entry, f, indent=2, ensure_ascii=False)
+    return log_entry
+
+def get_deploy_log(quest_id):
+    """Get the detailed deploy log for a quest."""
+    log_file = DEPLOY_LOG_DIR / f"{quest_id}.json"
+    if log_file.exists():
+        with open(log_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
+
+async def notify_deploy(bot, quest_id, short_summary, detailed_log):
+    """Send short deploy notification to Telegram + save detailed log."""
+    save_deploy_log(quest_id, short_summary, detailed_log)
+    chat_id = load_chat_id()
+    if chat_id:
+        await bot.send_message(
+            chat_id=chat_id,
+            text=(
+                f"🚀 *Deploy Complete — {quest_id}*\n"
+                f"━━━━━━━━━━━━━━━━━━━━━\n\n"
+                f"{short_summary}\n\n"
+                f"_Type /deploylog {quest_id} for full details._"
+            ),
+            parse_mode="Markdown",
+        )
+
 
 # ═══════════════════════════════════
 # UTILITIES
@@ -438,6 +579,124 @@ async def cmd_protocol(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_quest_board(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler /questboard — Show all quests with their status."""
+    board = load_quest_board()
+    if not board["quests"]:
+        await update.message.reply_text("✦ Quest board is empty. I'll propose something soon.")
+        return
+
+    status_icons = {"proposed": "💡", "approved": "✅", "in_progress": "🔄", "deployed": "🚀", "failed": "❌"}
+    impact_icons = {"critico": "🔴", "alto": "🟡", "medio": "🔵"}
+
+    lines = ["🦌 *Eko Quest Board*\n━━━━━━━━━━━━━━━━━━━━━\n"]
+    for q in board["quests"][-10:]:
+        icon = status_icons.get(q["status"], "❓")
+        imp = impact_icons.get(q["impact"], "⚪")
+        lines.append(f"{icon} *{q['id']}* — {q['title']}")
+        lines.append(f"   {imp} {q['impact']} · {q['status']}")
+        if q.get("github_issue"):
+            lines.append(f"   🔗 [Issue]({q['github_issue']})")
+        lines.append("")
+
+    lines.append("_Approve quests from the dashboard or type:_")
+    lines.append("_/approve Q001_")
+
+    await update.message.reply_text("\n".join(lines), parse_mode="Markdown", disable_web_page_preview=True)
+
+
+async def cmd_approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler /approve Q001 — Approve a quest."""
+    if not context.args:
+        await update.message.reply_text("Usage: /approve Q001")
+        return
+
+    quest_id = context.args[0].upper()
+    quest = approve_quest(quest_id)
+
+    if not quest:
+        await update.message.reply_text(f"✦ Quest {quest_id} not found.")
+        return
+
+    reply = f"✅ *Quest {quest['id']} approved!*\n\n"
+    reply += f"*{quest['title']}*\n"
+    reply += f"{quest['description']}\n\n"
+    if quest.get("github_issue"):
+        reply += f"🔗 [GitHub Issue]({quest['github_issue']})\n\n"
+    reply += "_Eko will execute this quest on the next Cowork session._"
+
+    # Notify Fauno
+    await update.message.reply_text(reply, parse_mode="Markdown", disable_web_page_preview=True)
+
+    # Save to memory for context
+    save_to_memory("system", f"Quest {quest['id']} approved: {quest['title']}", update.effective_chat.id)
+
+
+async def cmd_propose(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler /propose Title | Description — Propose a new quest."""
+    if not context.args:
+        await update.message.reply_text("Usage: /propose Fix the weight chart | Add a proper line chart for weight tracking")
+        return
+
+    full_text = " ".join(context.args)
+    if "|" in full_text:
+        title, description = full_text.split("|", 1)
+    else:
+        title = full_text
+        description = full_text
+
+    quest = add_quest(title.strip(), description.strip(), impact="medio", source="fauno")
+
+    await update.message.reply_text(
+        f"💡 *New Quest Proposed!*\n\n"
+        f"*{quest['id']}* — {quest['title']}\n"
+        f"{quest['description']}\n\n"
+        f"_Approve it with /approve {quest['id']}_",
+        parse_mode="Markdown"
+    )
+
+
+async def cmd_deploylog(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler /deploylog Q001 — Show detailed deploy log."""
+    if not context.args:
+        # Show recent deploys
+        if DEPLOY_LOG_DIR.exists():
+            logs = sorted(DEPLOY_LOG_DIR.glob("*.json"), reverse=True)[:5]
+            if logs:
+                lines = ["📋 *Recent Deploys*\n"]
+                for lf in logs:
+                    with open(lf) as f:
+                        entry = json.load(f)
+                    lines.append(f"🚀 *{entry['quest_id']}* — {entry['timestamp'][:10]}")
+                    lines.append(f"   {entry['short'][:80]}\n")
+                lines.append("_Use /deploylog QXXX for full details._")
+                await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+                return
+        await update.message.reply_text("No deploys yet.")
+        return
+
+    quest_id = context.args[0].upper()
+    log = get_deploy_log(quest_id)
+
+    if not log:
+        await update.message.reply_text(f"No deploy log found for {quest_id}.")
+        return
+
+    # Send detailed version (plain text, no markdown issues)
+    detail_text = (
+        f"📋 Deploy Log — {log['quest_id']}\n"
+        f"Date: {log['timestamp'][:16]}\n"
+        f"{'=' * 30}\n\n"
+        f"SUMMARY:\n{log['short']}\n\n"
+        f"DETAILS:\n{log['detailed']}"
+    )
+    # Trim for Telegram limit
+    if len(detail_text) > 4000:
+        detail_text = detail_text[:4000] + "\n\n... (truncated)"
+
+    await update.message.reply_text(detail_text)
+
+
 def build_system_prompt():
     """Build Eko's system prompt with profile context."""
     profile = load_profile()
@@ -718,6 +977,10 @@ async def post_init(application: Application):
         BotCommand("english", "Daily English challenge"),
         BotCommand("idiom", "English idiom of the day"),
         BotCommand("protocol", "Open Protocollo: Fauno dashboard"),
+        BotCommand("questboard", "View Eko quest board"),
+        BotCommand("propose", "Propose a new quest"),
+        BotCommand("approve", "Approve a quest (e.g. /approve Q001)"),
+        BotCommand("deploylog", "View deploy details"),
         BotCommand("help", "Lista comandi"),
     ]
     await application.bot.set_my_commands(commands)
@@ -772,6 +1035,10 @@ def main():
     app.add_handler(CommandHandler("english", cmd_english))
     app.add_handler(CommandHandler("idiom", cmd_idiom))
     app.add_handler(CommandHandler("protocol", cmd_protocol))
+    app.add_handler(CommandHandler("questboard", cmd_quest_board))
+    app.add_handler(CommandHandler("propose", cmd_propose))
+    app.add_handler(CommandHandler("approve", cmd_approve))
+    app.add_handler(CommandHandler("deploylog", cmd_deploylog))
 
     # Text handler (catch-all)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))

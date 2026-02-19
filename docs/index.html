@@ -339,8 +339,37 @@ function App() {
 
   const updPers = (k, v) => setS(p => ({ ...p, eko: { ...p.eko, personalita: { ...p.eko.personalita, [k]: v } } }));
   const togSch = (id) => setS(p => ({ ...p, scheduler: p.scheduler.map(t => t.id === id ? { ...t, on: !t.on } : t) }));
-  const eqAct = (id, st) => { setS(p => ({ ...p, eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st } : q) } })); if (st === "ok") addLog("Eko quest approved", "eko"); };
-  const impAct = (id, st) => setS(p => ({ ...p, improvements: p.improvements.map(i => i.id === id ? { ...i, stato: st } : i) }));
+  // Notify Telegram bot when a quest/proposal is approved
+  const notifyBot = async (message) => {
+    const T = "8579718161:AAEruE9Owq7cURcius6K6DTcADaDkAKOD2o";
+    const C = "94050788";
+    try {
+      await fetch(`https://api.telegram.org/bot${T}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: C, text: message, parse_mode: "Markdown" }),
+      });
+    } catch (e) { console.log("Bot notify failed:", e); }
+  };
+
+  const eqAct = (id, st) => {
+    setS(p => ({ ...p, eko: { ...p.eko, questEko: p.eko.questEko.map(q => q.id === id ? { ...q, s: st } : q) } }));
+    if (st === "ok") {
+      const quest = eko.questEko.find(q => q.id === id);
+      addLog(`Quest "${quest?.n}" approved`, "eko");
+      notifyBot(`🚀 *Quest Approved from Dashboard*\n\n*${quest?.n}*\n${quest?.d}\n\n_Eko, execute on next Cowork session._`);
+      flash("Quest approved! Eko notified on Telegram.");
+    }
+  };
+  const impAct = (id, st) => {
+    setS(p => ({ ...p, improvements: p.improvements.map(i => i.id === id ? { ...i, stato: st } : i) }));
+    if (st === "approvata") {
+      const imp = improvements.find(i => i.id === id);
+      addLog(`Proposal "${imp?.titolo}" approved`, "eko");
+      notifyBot(`✅ *Proposal Approved*\n\n*${imp?.titolo}*\n${imp?.desc}\n\nImpact: ${imp?.impatto}\n\n_Eko, plan and execute._`);
+      flash("Approved! Eko notified.");
+    }
+  };
 
   const addCristinaNote = () => { if (!cNote.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, noteRelazione: [...p.cristina.noteRelazione, { t: new Date().toLocaleDateString("it-IT"), n: cNote }] } })); setCNote(""); addLog("Relationship note added", "cuore"); flash("Saved!"); };
   const addCristinaGesto = () => { if (!cGesto.trim()) return; setS(p => ({ ...p, cristina: { ...p.cristina, gestaRecenti: [...p.cristina.gestaRecenti, { t: new Date().toLocaleDateString("it-IT"), g: cGesto }], ultimoGesto: new Date().toLocaleDateString("it-IT") } })); setCGesto(""); addLog("Care gesture recorded", "cuore"); flash("Beautiful gesture!"); };
